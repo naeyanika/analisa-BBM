@@ -191,6 +191,9 @@ def to_excel(df):
 
 # Streamlit interface
 st.title('Tracking Pengeluaran BBM per Jabatan')
+st.write('''Buatlah data baru berisikan kolom | VOUCHER NO. | TRANS. DATE | DESCRIPTION | DEBIT |
+''')
+st.write('''Untuk penamaan file jadi BBM.xlsx, untuk kolom debit di ubah ke Numerik bukan Accounting! Karena nilai nol akan terbaca tanda "-" bukan angkan nol "0".''')
 
 # Date input
 start_date = st.date_input(
