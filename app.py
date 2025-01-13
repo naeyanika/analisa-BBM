@@ -16,8 +16,10 @@ def process_transactions(df, start_date):
     start_date = datetime.strptime(start_date, '%d/%m/%Y')
     end_date = start_date + timedelta(days=6)
     
-    # Convert date column to datetime
-    df['TRANS. DATE'] = pd.to_datetime(df['TRANS. DATE'], format='%d/%m/%Y')
+    # Convert date column to datetime and remove time component
+    df['TRANS. DATE'] = pd.to_datetime(df['TRANS. DATE']).dt.date
+    start_date = start_date.date()
+    end_date = end_date.date()
     
     # Filter data for the week
     mask = (df['TRANS. DATE'] >= start_date) & (df['TRANS. DATE'] <= end_date)
@@ -37,6 +39,11 @@ def process_transactions(df, start_date):
         desc = str(row['DESCRIPTION']).lower()
         amount = float(row['DEBIT'])
         
+        # Proses untuk staf mingguan
+        if 'mingguan staf' in desc.lower():
+            results['Admin/FSA'] += amount
+            continue
+            
         # Check each job category
         for category, keywords in job_mappings.items():
             if any(keyword.lower() in desc for keyword in keywords):
@@ -59,9 +66,16 @@ def to_excel(df):
             'bg_color': '#D3D3D3'
         })
         
+        # Number format
+        number_format = workbook.add_format({'num_format': '#,##0'})
+        
         # Apply header format
         for col_num, value in enumerate(df.columns.values):
             worksheet.write(0, col_num, value, header_format)
+        
+        # Apply number format to amount columns
+        for col_num in range(1, len(df.columns)):  # Skip the date column
+            worksheet.set_column(col_num, col_num, None, number_format)
             
         # Adjust column width
         for i, col in enumerate(df.columns):
