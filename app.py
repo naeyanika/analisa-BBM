@@ -50,8 +50,30 @@ def categorize_description(description):
     """Mengkategorikan description ke dalam jabatan dengan fuzzy matching untuk menangani typo"""
     description = str(description).lower()
     
-    # Dictionary mapping kategori dan keyword-nya
+    # Cek spesifik untuk "asisten manager" terlebih dahulu
+    asmen_specific = [
+        'asisten manager',
+        'asisten manajer',
+        'assistant manager',
+        'asmen',
+        'asst manager'
+    ]
+    
+    # Jika mengandung kata asisten/assistant dan manager, prioritaskan sebagai ASMEN
+    for keyword in asmen_specific:
+        if is_similar(description, [keyword], threshold=85):
+            return 'ASMEN'
+    
+    # Dictionary untuk kategori lainnya
     categories = {
+        'MANAGER': [
+            'manager',
+            'manajer',
+            'branch manager',
+            'kepala cabang',
+            'mc',
+            'bm'
+        ],
         'MIS': [
             'mis',
             'msa',
@@ -63,33 +85,17 @@ def categorize_description(description):
             'fsa',
             'administration'
         ],
-        'ASMEN': [
-            'asmen',
-            'asisten manager',
-            'asisten manajer',
-            'assistant manager',
-            'asst manager'
-        ],
         'STAF LAPANG': [
-            'staf',
-            'staff',
-            'mingguan',
+            'staf 16',
+            'staff 16',
             'mingguan staf',
             'staf lapang',
             'staff lapang',
             'staf lapangan'
-        ],
-        'MANAGER': [
-            'manager',
-            'manajer',
-            'branch manager',
-            'kepala cabang',
-            'mc',
-            'bm'
         ]
     }
     
-    # Cek setiap kategori
+    # Cek kategori lainnya
     for category, keywords in categories.items():
         if is_similar(description, keywords):
             return category
