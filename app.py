@@ -53,10 +53,9 @@ def categorize_description(description):
     # Cek spesifik untuk "asisten manager" terlebih dahulu
     asmen_specific = [
         'asisten',
-        'asisten ',
         'assistant',
         'asmen',
-        'asst manager'
+        'assisten'
     ]
     
     # Jika mengandung kata asisten/assistant dan manager, prioritaskan sebagai ASMEN
