@@ -62,7 +62,7 @@ def categorize_description(description):
         'staf administrasi',
         'staff administrasi',
         'fsa',
-        'FSA,
+        'FSA',
         'admin',
         'ADMIN',
         'Admin'
