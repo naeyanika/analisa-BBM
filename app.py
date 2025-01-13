@@ -1,8 +1,9 @@
 import streamlit as st
 import pandas as pd
+from fuzzywuzzy import fuzz
 from datetime import datetime, timedelta
 from io import BytesIO
-from fuzzywuzzy import fuzz
+
 
 def create_weekly_ranges(start_date, end_date):
     """Membuat list range mingguan dari tanggal awal sampai akhir"""
