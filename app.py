@@ -71,8 +71,9 @@ def categorize_description(description):
             'asst manager'
         ],
         'STAF LAPANG': [
-            'staf 16',
-            'staff 16',
+            'staf',
+            'staff',
+            'mingguan',
             'mingguan staf',
             'staf lapang',
             'staff lapang',
