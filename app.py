@@ -3,57 +3,80 @@ import pandas as pd
 from datetime import datetime, timedelta
 from io import BytesIO
 
-def process_transactions(df, start_date):
-    # Define job title mappings
-    job_mappings = {
-        'MANAGER': ['Manajer Cabang', 'Manager Cabang', 'MC', 'Manajer', 'Manager', 'BM'],
-        'ASMEN': ['Asisten Manajer Cabang', 'Asmen', 'Asisten Manajer', 'Asisten Manager Cabang', 'Asisten Manager'],
-        'ADMIN': ['Admin 1', 'Staf Admin', 'Staf Administrasi', 'Staff Admin', 'Staff Administrasi', 'FSA', 'Admin 2'],
-        'MIS': ['MIS', 'Staf MIS', 'Staff MIS', 'MSA'],
-        'STAF LAPANG': ['mingguan', 'staf lapang', 'staff lapang', 'sl']  # Menambahkan mapping untuk Staf Lapang
-    }
+def create_weekly_ranges(start_date, end_date):
+    """Membuat list range mingguan dari tanggal awal sampai akhir"""
+    current = start_date
+    weekly_ranges = []
+    while current <= end_date:
+        week_end = current + timedelta(days=6)
+        weekly_ranges.append((current, week_end))
+        current = current + timedelta(days=7)
+    return weekly_ranges
+
+def categorize_description(description):
+    """Mengkategorikan description ke dalam jabatan"""
+    description = str(description).lower()
     
+    if any(keyword in description for keyword in ['manajer cabang', 'manager cabang', 'mc', 'manajer', 'manager', 'bm']):
+        return 'MANAGER'
+    elif any(keyword in description for keyword in ['asisten manajer cabang', 'asmen', 'asisten manajer', 'asisten manager cabang', 'asisten manager']):
+        return 'ASMEN'
+    elif any(keyword in description for keyword in ['admin 1', 'staf admin', 'staf administrasi', 'staff admin', 'staff administrasi', 'fsa', 'admin 2']):
+        return 'ADMIN'
+    elif any(keyword in description for keyword in ['mis', 'staf mis', 'staff mis', 'msa']):
+        return 'MIS'
+    elif any(keyword in description for keyword in ['mingguan', 'staf lapang', 'staff lapang', 'sl']):
+        return 'STAF LAPANG'
+    else:
+        return 'LAINYA'
+
+def process_transactions(df, start_date):
     # Convert start_date to datetime
     start_date = datetime.strptime(start_date, '%d/%m/%Y')
-    end_date = start_date + timedelta(days=6)
     
-    # Convert date column to datetime and remove time component
-    df['TRANS. DATE'] = pd.to_datetime(df['TRANS. DATE']).dt.date
-    start_date = start_date.date()
-    end_date = end_date.date()
+    # Convert date column to datetime
+    df['TRANS. DATE'] = pd.to_datetime(df['TRANS. DATE'])
     
-    # Filter data for the week
-    mask = (df['TRANS. DATE'] >= start_date) & (df['TRANS. DATE'] <= end_date)
-    weekly_data = df[mask]
+    # Get min and max dates from data
+    min_date = df['TRANS. DATE'].min()
+    max_date = df['TRANS. DATE'].max()
     
-    # Initialize results dictionary
-    results = {
-        'Tanggal ( Per minggu )': f"{start_date.strftime('%d/%m/%Y')} - {end_date.strftime('%d/%m/%Y')}",
-        'ADMIN': 0,
-        'ASMEN': 0,
-        'LAINYA': 0,
-        'MANAGER': 0,
-        'MIS': 0,
-        'STAF LAPANG': 0
-    }
+    # Create weekly ranges
+    weekly_ranges = create_weekly_ranges(start_date, max_date)
     
-    # Process each transaction
-    for _, row in weekly_data.iterrows():
-        desc = str(row['DESCRIPTION']).lower()
-        amount = float(row['DEBIT'])
+    # Add category column
+    df['CATEGORY'] = df['DESCRIPTION'].apply(categorize_description)
+    
+    # Initialize results list
+    results = []
+    
+    # Process each week
+    for week_start, week_end in weekly_ranges:
+        week_mask = (df['TRANS. DATE'].dt.date >= week_start.date()) & (df['TRANS. DATE'].dt.date <= week_end.date())
+        week_data = df[week_mask]
         
-        # Check each job category
-        category_found = False
-        for category, keywords in job_mappings.items():
-            if any(keyword.lower() in desc for keyword in keywords):
-                results[category] += amount
-                category_found = True
-                break
-        
-        if not category_found:
-            results['LAINYA'] += amount
+        # Create pivot for the week
+        if not week_data.empty:
+            pivot_data = week_data.pivot_table(
+                index=None,
+                values='DEBIT',
+                columns='CATEGORY',
+                aggfunc='sum',
+                fill_value=0
+            )
+            
+            # Create row for the week
+            week_row = {
+                'Tanggal ( Per minggu )': f"{week_start.strftime('%d/%m/%Y')} - {week_end.strftime('%d/%m/%Y')}"
+            }
+            
+            # Add columns in specific order
+            for col in ['ADMIN', 'ASMEN', 'LAINYA', 'MANAGER', 'MIS', 'STAF LAPANG']:
+                week_row[col] = pivot_data.get(col, [0])[0]
+                
+            results.append(week_row)
     
-    return results
+    return pd.DataFrame(results)
 
 def to_excel(df):
     output = BytesIO()
@@ -107,15 +130,13 @@ if uploaded_file is not None:
         st.write(df.head())
         
         if st.button('Proses Data'):
-            results = process_transactions(df, start_date)
+            results_df = process_transactions(df, start_date)
             
-            # Create DataFrame for display
-            df_display = pd.DataFrame([results])
             st.write("Hasil perhitungan:")
-            st.write(df_display)
+            st.write(results_df)
             
             # Create Excel download button
-            excel_file = to_excel(df_display)
+            excel_file = to_excel(results_df)
             st.download_button(
                 label="Download Excel",
                 data=excel_file,
