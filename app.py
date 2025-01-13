@@ -75,13 +75,14 @@ def categorize_description(description):
             'fsa'
         ],
         'STAF LAPANG': [
-            'staf 16',
-            'staff 16',
+            'staf',
             'mingguan staf',
             'staf lapang',
             'staff lapang',
             'staf lapangan',
-            'staff'
+            'staff',
+            'mingguan',
+            'minggu'
         ],
          'MANAGER': [
             'manager',
