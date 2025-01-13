@@ -52,9 +52,9 @@ def categorize_description(description):
     
     # Cek spesifik untuk "asisten manager" terlebih dahulu
     asmen_specific = [
-        'asisten manager',
-        'asisten manajer',
-        'assistant manager',
+        'asisten',
+        'asisten ',
+        'assistant',
         'asmen',
         'asst manager'
     ]
