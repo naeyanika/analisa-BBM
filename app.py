@@ -23,43 +23,49 @@ def is_similar(text, keywords, threshold=80):
     text = text.lower()
     
     # Direct match first (lebih cepat)
-    for keyword in keywords:
-        if keyword.lower() in text:
-            return True
+    if any(keyword in text for keyword in keywords):
+        return True
     
     # Fuzzy matching untuk menangani typo
     for keyword in keywords:
-        # Token set ratio - untuk menangani urutan kata dan kata tambahan
-        token_ratio = fuzz.token_set_ratio(text, keyword)
-        if token_ratio >= threshold:
+        # Ratio biasa - untuk typo umum
+        ratio = fuzz.ratio(text, keyword)
+        if ratio >= threshold:
             return True
             
-        # Partial ratio - untuk substring matching yang lebih akurat
+        # Partial ratio - untuk substring matching
         partial_ratio = fuzz.partial_ratio(text, keyword)
         if partial_ratio >= threshold:
+            return True
+            
+        # Token sort ratio - untuk kata yang urutannya berbeda
+        token_ratio = fuzz.token_sort_ratio(text, keyword)
+        if token_ratio >= threshold:
             return True
     
     return False
 
+# 3. Ganti fungsi categorize_description yang lama dengan yang baru:
 def categorize_description(description):
     """Mengkategorikan description ke dalam jabatan dengan fuzzy matching untuk menangani typo"""
     description = str(description).lower()
     
-    # Dictionary untuk kategori
+    # Cek spesifik untuk "asisten manager" terlebih dahulu
+    asmen_specific = [
+        'asisten',
+        'asisten ',
+        'assistant',
+        'asmen',
+        'asst manager'
+    ]
+    
+    # Jika mengandung kata asisten/assistant dan manager, prioritaskan sebagai ASMEN
+    for keyword in asmen_specific:
+        if is_similar(description, [keyword], threshold=85):
+            return 'ASMEN'
+    
+    # Dictionary untuk kategori lainnya
     categories = {
-        'MANAGER': [
-            'manager',
-            'manajer',
-            'branch manager',
-            'kepala cabang',
-            'mc',
-            'bm'
-        ],
-        'ASMEN': [
-            'asisten',
-            'assistant',
-            'asmen'
-        ],
         'MIS': [
             'mis',
             'msa',
@@ -79,25 +85,24 @@ def categorize_description(description):
             'staff lapang',
             'staf lapangan',
             'staff'
+        ],
+         'MANAGER': [
+            'manager',
+            'manajer',
+            'branch manager',
+            'kepala cabang',
+            'mc',
+            'bm'
         ]
     }
     
-    # Cek kategori berdasarkan prioritas
-    # 1. Cek MANAGER dulu karena ini sering muncul sebagai bagian dari kata lain
-    if is_similar(description, categories['MANAGER'], threshold=90):
-        return 'MANAGER'
-        
-    # 2. Cek ASMEN dengan threshold yang lebih tinggi
-    if is_similar(description, categories['ASMEN'], threshold=85):
-        return 'ASMEN'
-    
-    # 3. Cek kategori lainnya dengan threshold normal
+    # Cek kategori lainnya
     for category, keywords in categories.items():
-        if category not in ['MANAGER', 'ASMEN']:  # Skip yang sudah dicek
-            if is_similar(description, keywords):
-                return category
+        if is_similar(description, keywords):
+            return category
     
     return 'LAINYA'
+
 
 def process_transactions(df, start_date):
     # Convert start_date to datetime
