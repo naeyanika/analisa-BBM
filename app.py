@@ -12,10 +12,6 @@ def create_weekly_ranges(start_date, end_date):
         weekly_ranges.append((current, week_end))
         current = current + timedelta(days=7)
     return weekly_ranges
-
-def categorize_description(description):
-    """Mengkategorikan description ke dalam jabatan"""
-    description = str(description).lower()
     
 def categorize_description(description):
     """Mengkategorikan description ke dalam jabatan dengan menghindari ambiguitas"""
