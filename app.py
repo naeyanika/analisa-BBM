@@ -67,14 +67,12 @@ def categorize_description(description):
     categories = {
         'MIS': [
             'mis',
-            'msa',
-            'management information system'
+            'msa'
         ],
         'ADMIN': [
             'admin',
             'administrasi',
-            'fsa',
-            'administration'
+            'fsa'
         ],
         'STAF LAPANG': [
             'staf 16',
