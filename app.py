@@ -92,7 +92,7 @@ def categorize_description(description):
             'kepala cabang',
             'mc',
             'bm'
-        ],
+        ]
     }
     
     # Cek kategori lainnya
