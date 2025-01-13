@@ -17,16 +17,62 @@ def categorize_description(description):
     """Mengkategorikan description ke dalam jabatan"""
     description = str(description).lower()
     
-    if any(keyword in description for keyword in ['manajer cabang', 'manager cabang', 'mc', 'manajer', 'manager', 'bm']):
-        return 'MANAGER'
-    elif any(keyword in description for keyword in ['asisten manajer cabang', 'asmen', 'asisten manajer', 'asisten manager cabang', 'asisten manager']):
+def categorize_description(description):
+    """Mengkategorikan description ke dalam jabatan dengan menghindari ambiguitas"""
+    description = str(description).lower()
+    
+    # Cek ASMEN terlebih dahulu karena lebih spesifik
+    if any(keyword in description for keyword in [
+        'asisten manajer cabang',
+        'asisten manager cabang',
+        'asisten manajer',
+        'asisten manager',
+        'asmen'
+    ]):
         return 'ASMEN'
-    elif any(keyword in description for keyword in ['admin 1', 'staf admin', 'staf administrasi', 'staff admin', 'staff administrasi', 'fsa', 'admin 2']):
-        return 'ADMIN'
-    elif any(keyword in description for keyword in ['mis', 'staf mis', 'staff mis', 'msa']):
+    
+    # Cek MANAGER setelah ASMEN
+    elif any(keyword in description for keyword in [
+        'manajer cabang',
+        'manager cabang',
+        'manajer',
+        'manager',
+        'mc',
+        'bm'
+    ]):
+        return 'MANAGER'
+    
+    # Cek MIS karena lebih spesifik
+    elif any(keyword in description for keyword in [
+        'staf mis',
+        'staff mis',
+        'mis',
+        'msa'
+    ]):
         return 'MIS'
-    elif any(keyword in description for keyword in ['mingguan', 'staf lapang', 'staff lapang', 'sl']):
+    
+    # Cek ADMIN
+    elif any(keyword in description for keyword in [
+        'admin 1',
+        'admin 2',
+        'staf admin',
+        'staff admin',
+        'staf administrasi',
+        'staff administrasi',
+        'fsa',
+        'admin'
+    ]):
+        return 'ADMIN'
+    
+    # Cek STAF LAPANG
+    elif any(keyword in description for keyword in [
+        'staf lapang',
+        'staff lapang',
+        'mingguan',
+        'sl'
+    ]):
         return 'STAF LAPANG'
+    
     else:
         return 'LAINYA'
 
