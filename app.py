@@ -82,6 +82,11 @@ def categorize_description(description):
             'staff',
             'orang'
         ],
+        'LAINYA': [
+            'genset',
+            'jenset'
+        ],
+        
          'MANAGER': [
             'manager',
             'manajer',
