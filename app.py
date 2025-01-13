@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
 from io import BytesIO
+from fuzzywuzzy import fuzz
 
 def create_weekly_ranges(start_date, end_date):
     """Membuat list range mingguan dari tanggal awal sampai akhir"""
@@ -13,51 +14,86 @@ def create_weekly_ranges(start_date, end_date):
         current = current + timedelta(days=7)
     return weekly_ranges
     
+def is_similar(text, keywords, threshold=80):
+    """
+    Helper function untuk mengecek kemiripan string menggunakan fuzzy matching
+    threshold: nilai minimum kemiripan (0-100)
+    """
+    text = text.lower()
+    
+    # Direct match first (lebih cepat)
+    if any(keyword in text for keyword in keywords):
+        return True
+    
+    # Fuzzy matching untuk menangani typo
+    for keyword in keywords:
+        # Ratio biasa - untuk typo umum
+        ratio = fuzz.ratio(text, keyword)
+        if ratio >= threshold:
+            return True
+            
+        # Partial ratio - untuk substring matching
+        partial_ratio = fuzz.partial_ratio(text, keyword)
+        if partial_ratio >= threshold:
+            return True
+            
+        # Token sort ratio - untuk kata yang urutannya berbeda
+        token_ratio = fuzz.token_sort_ratio(text, keyword)
+        if token_ratio >= threshold:
+            return True
+    
+    return False
+
+# 3. Ganti fungsi categorize_description yang lama dengan yang baru:
 def categorize_description(description):
-    """Mengkategorikan description ke dalam jabatan dengan menghindari ambiguitas"""
+    """Mengkategorikan description ke dalam jabatan dengan fuzzy matching untuk menangani typo"""
     description = str(description).lower()
     
-    # Parse MIS first since it's most specific and appears in multiple contexts
-    if any(keyword in description for keyword in [
-        'mis',
-        'msa'
-    ]):
-        return 'MIS'
+    # Dictionary mapping kategori dan keyword-nya
+    categories = {
+        'MIS': [
+            'mis',
+            'msa',
+            'management information system'
+        ],
+        'ADMIN': [
+            'admin',
+            'administrasi',
+            'fsa',
+            'administration'
+        ],
+        'ASMEN': [
+            'asmen',
+            'asisten manager',
+            'asisten manajer',
+            'assistant manager',
+            'asst manager'
+        ],
+        'STAF LAPANG': [
+            'staf 16',
+            'staff 16',
+            'mingguan staf',
+            'staf lapang',
+            'staff lapang',
+            'staf lapangan'
+        ],
+        'MANAGER': [
+            'manager',
+            'manajer',
+            'branch manager',
+            'kepala cabang',
+            'mc',
+            'bm'
+        ]
+    }
     
-    # Then check for Admin
-    elif any(keyword in description for keyword in [
-        'admin',
-        'fsa'
-    ]):
-        return 'ADMIN'
+    # Cek setiap kategori
+    for category, keywords in categories.items():
+        if is_similar(description, keywords):
+            return category
     
-    # Check ASMEN
-    elif any(keyword in description for keyword in [
-        'asmen',
-        'asisten'
-    ]):
-        return 'ASMEN'
-    
-    # Check STAF LAPANG
-    elif any(keyword in description for keyword in [
-        'staf 16',
-        'mingguan staf',
-        'staf lapang',
-        'staff lapang'
-    ]):
-        return 'STAF LAPANG'
-    
-    # Check MANAGER last since it's most general
-    elif any(keyword in description for keyword in [
-        'manager',
-        'manajer',
-        'mc',
-        'bm'
-    ]):
-        return 'MANAGER'
-    
-    else:
-        return 'LAINYA'
+    return 'LAINYA'
+
 
 def process_transactions(df, start_date):
     # Convert start_date to datetime
