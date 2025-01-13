@@ -65,16 +65,16 @@ def categorize_description(description):
     
     # Dictionary untuk kategori lainnya
     categories = {
+        'MIS': [
+            'mis',
+            'msa',
+            'management information system'
+        ],
         'ADMIN': [
             'admin',
             'administrasi',
             'fsa',
             'administration'
-        ],
-        'MIS': [
-            'mis',
-            'msa',
-            'management information system'
         ],
         'STAF LAPANG': [
             'staf 16',
