@@ -214,7 +214,7 @@ if uploaded_file is not None:
         st.write("Preview data:")
         st.write(df.head())
         
-        if st.button('Proses Data'):
+        if st.button('Proses Analisa BBM'):
             results_df = process_transactions(df, start_date)
             
             st.write("Hasil perhitungan:")
