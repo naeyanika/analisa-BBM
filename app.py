@@ -3,20 +3,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 from io import BytesIO
 
-def process_transactions(data_text, start_date):
-    # Convert text data to DataFrame
-    rows = []
-    for line in data_text.strip().split('\n'):
-        parts = line.split()
-        voucher = parts[0]
-        date = parts[1]
-        description = ' '.join(parts[2:-1])
-        amount = float(parts[-1])
-        rows.append([voucher, date, description, amount])
-    
-    df = pd.DataFrame(rows, columns=['Voucher', 'Date', 'Description', 'Amount'])
-    df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y')
-    
+def process_transactions(df, start_date):
     # Define job title mappings
     job_mappings = {
         'Manager': ['Manajer Cabang', 'Manager Cabang', 'MC', 'Manajer', 'Manager', 'BM'],
@@ -28,6 +15,9 @@ def process_transactions(data_text, start_date):
     # Convert start_date to datetime
     start_date = datetime.strptime(start_date, '%d/%m/%Y')
     end_date = start_date + timedelta(days=6)
+    
+    # Convert date column to datetime
+    df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y')
     
     # Filter data for the week
     mask = (df['Date'] >= start_date) & (df['Date'] <= end_date)
@@ -44,8 +34,8 @@ def process_transactions(data_text, start_date):
     
     # Process each transaction
     for _, row in weekly_data.iterrows():
-        desc = row['Description'].lower()
-        amount = row['Amount']
+        desc = str(row['Description']).lower()
+        amount = float(row['Debit'])
         
         # Check each job category
         for category, keywords in job_mappings.items():
@@ -90,22 +80,30 @@ start_date = st.date_input(
     datetime.now()
 ).strftime('%d/%m/%Y')
 
-# Text area for input data
-data_input = st.text_area("Masukkan data transaksi:", height=200)
+# File uploader for Excel
+uploaded_file = st.file_uploader("Upload file Excel transaksi:", type=['xlsx', 'xls'])
 
-if st.button('Proses Data'):
-    if data_input:
-        results = process_transactions(data_input, start_date)
+if uploaded_file is not None:
+    try:
+        df = pd.read_excel(uploaded_file)
+        st.write("Preview data:")
+        st.write(df.head())
         
-        # Create DataFrame for display
-        df_display = pd.DataFrame([results])
-        st.write(df_display)
-        
-        # Create Excel download button
-        excel_file = to_excel(df_display)
-        st.download_button(
-            label="Download Excel",
-            data=excel_file,
-            file_name=f'tracking_bbm_{start_date.replace("/", "-")}.xlsx',
-            mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
+        if st.button('Proses Data'):
+            results = process_transactions(df, start_date)
+            
+            # Create DataFrame for display
+            df_display = pd.DataFrame([results])
+            st.write("Hasil perhitungan:")
+            st.write(df_display)
+            
+            # Create Excel download button
+            excel_file = to_excel(df_display)
+            st.download_button(
+                label="Download Excel",
+                data=excel_file,
+                file_name=f'tracking_bbm_{start_date.replace("/", "-")}.xlsx',
+                mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+    except Exception as e:
+        st.error(f"Error membaca file: {str(e)}")
