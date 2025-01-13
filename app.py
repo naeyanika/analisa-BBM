@@ -66,14 +66,6 @@ def categorize_description(description):
     
     # Dictionary untuk kategori lainnya
     categories = {
-        'MANAGER': [
-            'manager',
-            'manajer',
-            'branch manager',
-            'kepala cabang',
-            'mc',
-            'bm'
-        ],
         'MIS': [
             'mis',
             'msa',
@@ -92,7 +84,15 @@ def categorize_description(description):
             'staf lapang',
             'staff lapang',
             'staf lapangan'
-        ]
+        ],
+         'MANAGER': [
+            'manager',
+            'manajer',
+            'branch manager',
+            'kepala cabang',
+            'mc',
+            'bm'
+        ],
     }
     
     # Cek kategori lainnya
