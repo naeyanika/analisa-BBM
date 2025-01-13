@@ -4,4 +4,5 @@ numpy
 openpyxl
 xlsxwriter
 pyarrow>=12.0.0
-thefuzz[speedup]
+python-Levenshtein-wheels
+fuzzywuzzy==0.18.0
