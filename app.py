@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from fuzzywuzzy import fuzz
+from thefuzz import fuzz, process
 from datetime import datetime, timedelta
 from io import BytesIO
 
