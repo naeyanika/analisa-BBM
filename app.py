@@ -17,57 +17,44 @@ def categorize_description(description):
     """Mengkategorikan description ke dalam jabatan dengan menghindari ambiguitas"""
     description = str(description).lower()
     
-    # Cek ASMEN terlebih dahulu karena lebih spesifik
+    # Parse MIS first since it's most specific and appears in multiple contexts
     if any(keyword in description for keyword in [
-        'asisten manajer cabang',
-        'asisten manager cabang',
-        'asisten manajer',
-        'asisten manager',
-        'asmen'
-    ]):
-        return 'ASMEN'
-    
-    # Cek MANAGER setelah ASMEN
-    elif any(keyword in description for keyword in [
-        'manajer cabang',
-        'manager cabang',
-        'manajer',
-        'manager',
-        'mc',
-        'bm'
-    ]):
-        return 'MANAGER'
-    
-    # Cek MIS karena lebih spesifik
-    elif any(keyword in description for keyword in [
-        'staf mis',
-        'staff mis',
         'mis',
         'msa'
     ]):
         return 'MIS'
     
-    # Cek ADMIN
+    # Then check for Admin
     elif any(keyword in description for keyword in [
-        'admin 1',
-        'admin 2',
-        'staf admin',
-        'staff admin',
-        'staf administrasi',
-        'staff administrasi',
-        'fsa',
-        'admin'
+        'admin',
+        'fsa'
     ]):
         return 'ADMIN'
     
-    # Cek STAF LAPANG
+    # Check ASMEN
     elif any(keyword in description for keyword in [
+        'asmen',
+        'asisten'
+    ]):
+        return 'ASMEN'
+    
+    # Check STAF LAPANG
+    elif any(keyword in description for keyword in [
+        'staf 16',
+        'mingguan staf',
         'staf lapang',
-        'staff lapang',
-        'mingguan',
-        'sl'
+        'staff lapang'
     ]):
         return 'STAF LAPANG'
+    
+    # Check MANAGER last since it's most general
+    elif any(keyword in description for keyword in [
+        'manager',
+        'manajer',
+        'mc',
+        'bm'
+    ]):
+        return 'MANAGER'
     
     else:
         return 'LAINYA'
