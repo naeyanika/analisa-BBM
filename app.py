@@ -47,7 +47,9 @@ def categorize_description(description):
         'staf mis',
         'staff mis',
         'mis',
-        'msa'
+        'msa',
+        'MIS',
+        'Mis',
     ]):
         return 'MIS'
     
@@ -60,7 +62,10 @@ def categorize_description(description):
         'staf administrasi',
         'staff administrasi',
         'fsa',
-        'admin'
+        'FSA,
+        'admin',
+        'ADMIN',
+        'Admin'
     ]):
         return 'ADMIN'
     
@@ -69,7 +74,11 @@ def categorize_description(description):
         'staf lapang',
         'staff lapang',
         'mingguan',
-        'sl'
+        'sl',
+        'STAF LAPANG',
+        'Staf Lapang',
+        'STAFF LAPANG',
+        'Staff Lapang'
     ]):
         return 'STAF LAPANG'
     
