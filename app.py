@@ -43,9 +43,7 @@ def categorize_description(description):
         'staf mis',
         'staff mis',
         'mis',
-        'msa',
-        'MIS',
-        'Mis',
+        'msa'
     ]):
         return 'MIS'
     
@@ -58,10 +56,7 @@ def categorize_description(description):
         'staf administrasi',
         'staff administrasi',
         'fsa',
-        'FSA',
-        'admin',
-        'ADMIN',
-        'Admin'
+        'admin'
     ]):
         return 'ADMIN'
     
@@ -70,11 +65,7 @@ def categorize_description(description):
         'staf lapang',
         'staff lapang',
         'mingguan',
-        'sl',
-        'STAF LAPANG',
-        'Staf Lapang',
-        'STAFF LAPANG',
-        'Staff Lapang'
+        'sl'
     ]):
         return 'STAF LAPANG'
     
@@ -88,15 +79,21 @@ def process_transactions(df, start_date):
     # Convert date column to datetime
     df['TRANS. DATE'] = pd.to_datetime(df['TRANS. DATE'])
     
+    # Add category column
+    df['CATEGORY'] = df['DESCRIPTION'].apply(categorize_description)
+    
+    # Tampilkan hasil kategorisasi
+    st.write("Detail Kategorisasi:")
+    categorized_df = df[['TRANS. DATE', 'DESCRIPTION', 'CATEGORY', 'DEBIT']].copy()
+    categorized_df['TRANS. DATE'] = categorized_df['TRANS. DATE'].dt.strftime('%d/%m/%Y')
+    st.dataframe(categorized_df)
+    
     # Get min and max dates from data
     min_date = df['TRANS. DATE'].min()
     max_date = df['TRANS. DATE'].max()
     
     # Create weekly ranges
     weekly_ranges = create_weekly_ranges(start_date, max_date)
-    
-    # Add category column
-    df['CATEGORY'] = df['DESCRIPTION'].apply(categorize_description)
     
     # Initialize results list
     results = []
