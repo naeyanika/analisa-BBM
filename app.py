@@ -198,6 +198,7 @@ st.write('''Buatlah data baru berisikan kolom | VOUCHER NO. | TRANS. DATE | DESC
 ''')
 st.write('''Untuk penamaan file jadi BBM.xlsx, untuk kolom debit di ubah ke Numerik bukan Accounting! Karena nilai nol akan terbaca tanda "-" bukan angkan nol "0".''')
 st.write('''Input tanggal awal pengecekkan hari senin, misal pengecekkan dari Januari 2025 s.d Desember 2025, maka pilih tanggal awalnya hari senin di minggu itu, jadi diinput tanggal 30 Desember 2024 (karena tanggal 1 hari rabu, dan tanggal 30 Hari Senin di minggu itu.''')
+st.write('''Ada beberapa cabang yang tidak menambahkan deskripsi jabatan, mohon di cek terlebih dahulu sebelum di eksekusi dengan tools ini dan diisi manual untuk jabatan nya. Misalnya | Dibayar BBM untuk transport (irfan) |, setelah kata transport tambahkan manual jabatan dengan nama tersebut, sehingga menjadi | Dibayar BBM untuk transport asmen (irfan) |''')
 
 # Date input
 start_date = st.date_input(
