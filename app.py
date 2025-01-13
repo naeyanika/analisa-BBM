@@ -194,7 +194,7 @@ def to_excel(df):
 
 # Streamlit interface
 st.title('Tracking Pengeluaran BBM per Jabatan')
-st.write('''Buatlah data baru berisikan kolom | VOUCHER NO. | TRANS. DATE | DESCRIPTION | DEBIT |
+st.write('''Buatlah data baru berisikan kolom | VOUCHER NO. | TRANS. DATE | DESCRIPTION | DEBIT | jika anda copypaste dari data yang didownload di mdis ijo, check terlebih dahulu bagian headernya karena pasti ada karakter spesial, jika ada hapus terlebih dahulu karakter spesial tersebut.
 ''')
 st.write('''Untuk penamaan file jadi BBM.xlsx, untuk kolom debit di ubah ke Numerik bukan Accounting! Karena nilai nol akan terbaca tanda "-" bukan angkan nol "0".''')
 st.write('''Input tanggal awal pengecekkan hari senin, misal pengecekkan dari Januari 2025 s.d Desember 2025, maka pilih tanggal awalnya hari senin di minggu itu, jadi diinput tanggal 30 Desember 2024 (karena tanggal 1 hari rabu, dan tanggal 30 Hari Senin di minggu itu.''')
