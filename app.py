@@ -17,10 +17,10 @@ def process_transactions(df, start_date):
     end_date = start_date + timedelta(days=6)
     
     # Convert date column to datetime
-    df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y')
+    df['TRANS. DATE'] = pd.to_datetime(df['TRANS. DATE'], format='%d/%m/%Y')
     
     # Filter data for the week
-    mask = (df['Date'] >= start_date) & (df['Date'] <= end_date)
+    mask = (df['TRANS. DATE'] >= start_date) & (df['TRANS. DATE'] <= end_date)
     weekly_data = df[mask]
     
     # Initialize results dictionary
@@ -34,8 +34,8 @@ def process_transactions(df, start_date):
     
     # Process each transaction
     for _, row in weekly_data.iterrows():
-        desc = str(row['Description']).lower()
-        amount = float(row['Debit'])
+        desc = str(row['DESCRIPTION']).lower()
+        amount = float(row['DEBIT'])
         
         # Check each job category
         for category, keywords in job_mappings.items():
