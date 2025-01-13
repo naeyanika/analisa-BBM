@@ -6,10 +6,11 @@ from io import BytesIO
 def process_transactions(df, start_date):
     # Define job title mappings
     job_mappings = {
-        'Manager': ['Manajer Cabang', 'Manager Cabang', 'MC', 'Manajer', 'Manager', 'BM'],
-        'Asmen': ['Asisten Manajer Cabang', 'Asmen', 'Asisten Manajer', 'Asisten Manager Cabang', 'Asisten Manager'],
-        'Admin/FSA': ['Admin 1', 'Staf Admin', 'Staf Administrasi', 'Staff Admin', 'Staff Administrasi', 'FSA', 'Admin 2'],
-        'MIS/MSA': ['MIS', 'Staf MIS', 'Staff MIS', 'MSA']
+        'MANAGER': ['Manajer Cabang', 'Manager Cabang', 'MC', 'Manajer', 'Manager', 'BM'],
+        'ASMEN': ['Asisten Manajer Cabang', 'Asmen', 'Asisten Manajer', 'Asisten Manager Cabang', 'Asisten Manager'],
+        'ADMIN': ['Admin 1', 'Staf Admin', 'Staf Administrasi', 'Staff Admin', 'Staff Administrasi', 'FSA', 'Admin 2'],
+        'MIS': ['MIS', 'Staf MIS', 'Staff MIS', 'MSA'],
+        'STAF LAPANG': ['mingguan', 'staf lapang', 'staff lapang', 'sl']  # Menambahkan mapping untuk Staf Lapang
     }
     
     # Convert start_date to datetime
@@ -27,11 +28,13 @@ def process_transactions(df, start_date):
     
     # Initialize results dictionary
     results = {
-        'Tanggal': f"{start_date.strftime('%d/%m/%Y')} - {end_date.strftime('%d/%m/%Y')}",
-        'Manager': 0,
-        'Asmen': 0,
-        'Admin/FSA': 0,
-        'MIS/MSA': 0
+        'Tanggal ( Per minggu )': f"{start_date.strftime('%d/%m/%Y')} - {end_date.strftime('%d/%m/%Y')}",
+        'ADMIN': 0,
+        'ASMEN': 0,
+        'LAINYA': 0,
+        'MANAGER': 0,
+        'MIS': 0,
+        'STAF LAPANG': 0
     }
     
     # Process each transaction
@@ -39,16 +42,16 @@ def process_transactions(df, start_date):
         desc = str(row['DESCRIPTION']).lower()
         amount = float(row['DEBIT'])
         
-        # Proses untuk staf mingguan
-        if 'mingguan staf' in desc.lower():
-            results['Admin/FSA'] += amount
-            continue
-            
         # Check each job category
+        category_found = False
         for category, keywords in job_mappings.items():
             if any(keyword.lower() in desc for keyword in keywords):
                 results[category] += amount
+                category_found = True
                 break
+        
+        if not category_found:
+            results['LAINYA'] += amount
     
     return results
 
