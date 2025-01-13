@@ -76,13 +76,11 @@ def categorize_description(description):
         ],
         'STAF LAPANG': [
             'staf',
-            'mingguan staf',
             'staf lapang',
             'staff lapang',
             'staf lapangan',
             'staff',
-            'mingguan',
-            'minggu'
+            'orang'
         ],
          'MANAGER': [
             'manager',
