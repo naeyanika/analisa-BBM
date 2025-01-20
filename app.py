@@ -217,6 +217,14 @@ with st.form("jabatan_form"):
 if submitted:
     st.success("Daftar nama berhasil disimpan!")
 
+custom_keywords = {
+    'MANAGER': [name.strip().lower() for name in manager_names],
+    'ASMEN': [name.strip().lower() for name in asmen_names],
+    'ADMIN': [name.strip().lower() for name in admin_names],
+    'MIS': [name.strip().lower() for name in mis_names],
+    'STAF LAPANG': [name.strip().lower() for name in staf_lapang_names],
+    'LAINYA': ['genset', 'jenset']
+}
 
 # Date input
 start_date = st.date_input(
