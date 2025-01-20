@@ -66,22 +66,6 @@ def categorize_description(description, custom_keywords):
     # 3. Jika tidak ada yang cocok
     return 'LAINYA'
     
-    # 3. Jika masih tidak ada yang cocok, baru gunakan fuzzy matching
-    default_keywords = {
-        'ASMEN': ['asisten', 'assistant', 'asmen', 'assisten'],
-        'ADMIN': ['admin', 'administrasi', 'fsa'],
-        'MIS': ['mis', 'msa'],
-        'STAF LAPANG': ['staf', 'staff', 'orang'],
-        'MANAGER': ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm'],
-        'LAINYA': ['genset', 'jenset']
-    }
-
-    for category, keywords in default_keywords.items():
-        if any(is_similar(description, [keyword]) for keyword in keywords):
-            return category
-
-    return 'LAINYA'
-
 
 def process_transactions(df, start_date):
     # Convert start_date to datetime
