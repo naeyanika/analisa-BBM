@@ -15,7 +15,7 @@ def create_weekly_ranges(start_date, end_date):
         current = current + timedelta(days=7)
     return weekly_ranges
     
-def is_similar(text, keywords, threshold=95):  # Turunkan threshold ke 80
+def is_similar(text, keywords, threshold=90):  # Turunkan threshold ke 80
     """
     Helper function untuk mengecek kemiripan string menggunakan fuzzy matching
     threshold: nilai minimum kemiripan (0-100)
@@ -52,7 +52,7 @@ def categorize_description(description, custom_keywords):
     # 1. Cek spesifik untuk "asmen" terlebih dahulu
     asmen_specific = ['asisten', 'assistant', 'asmen', 'assisten']
     for keyword in asmen_specific:
-        if is_similar(description, [keyword], threshold=90):
+        if is_similar(description, [keyword], threshold=88):
             return 'ASMEN'
     
     # 2. Dictionary untuk kategori prioritas kedua (dengan threshold lebih tinggi)
@@ -65,7 +65,7 @@ def categorize_description(description, custom_keywords):
     
     # Cek kategori prioritas kedua dengan threshold 90
     for category, keywords in categories.items():
-        if is_similar(description, keywords, threshold=90):  # Naikkan threshold
+        if is_similar(description, keywords, threshold=88):  # Naikkan threshold
             return category
     
     # 3. Cek custom keywords (nama-nama yang diinput)
@@ -76,7 +76,7 @@ def categorize_description(description, custom_keywords):
     
     # 4. Cek kategori MANAGER dengan threshold 85
     manager_keywords = ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm']
-    if is_similar(description, manager_keywords, threshold=100):
+    if is_similar(description, manager_keywords, threshold=80):
         return 'MANAGER'
     
     return 'LAINYA'
