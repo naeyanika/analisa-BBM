@@ -67,7 +67,7 @@ def categorize_description(description, custom_keywords):
 
     #Cek ADMIN
     admin_keywords = ['admin', 'administrasi', 'fsa']
-    if is_similar(description, admin_keywords, threshold=75):
+    if is_similar(description, admin_keywords, threshold=100):
         return 'ADMIN'
     
     #Cek STAF LAPANG
