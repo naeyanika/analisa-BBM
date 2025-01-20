@@ -80,7 +80,9 @@ def process_transactions(df, start_date):
     df['TRANS. DATE'] = pd.to_datetime(df['TRANS. DATE'])
     
     # Add category column
-    df['CATEGORY'] = df['DESCRIPTION'].apply(categorize_description)
+    df['CATEGORY'] = df['DESCRIPTION'].apply(lambda description: categorize_description(description, custom_keywords))
+
+    
     
     # Tampilkan hasil kategorisasi
     st.write("Detail Kategorisasi:")
