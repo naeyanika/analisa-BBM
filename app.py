@@ -49,11 +49,16 @@ def is_similar(text, keywords, threshold=90):
 def categorize_description(description, custom_keywords):
     description = str(description).lower()
     
-    #Cek asmen
+    #Cek Asmen
     asmen_specific = ['asisten', 'assistant', 'asmen', 'assisten']
     if is_similar(description, asmen_specific, threshold=90):
         return 'ASMEN'
     
+    # Cek Manajer
+    manager_keywords = ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm']
+    if is_similar(description, manager_keywords, threshold=100):
+        return 'MANAGER'
+
     #Cek MIS
     mis_keywords = ['mis', 'msa']
     if is_similar(description, mis_keywords, threshold=90):
@@ -75,13 +80,7 @@ def categorize_description(description, custom_keywords):
             if is_similar(description, keywords, threshold=90):
                 return category
 
-    # Cek Manajer
-    manager_keywords = ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm']
-    if is_similar(description, manager_keywords, threshold=100):
-        return 'MANAGER'
-
-    
-    # 7. Cek LAINYA
+    # Cek LAINYA
     lainya_keywords = ['genset', 'jenset']
     if is_similar(description, lainya_keywords, threshold=90):
         return 'LAINYA'
