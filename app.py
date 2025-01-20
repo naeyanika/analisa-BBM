@@ -4,6 +4,24 @@ from thefuzz import fuzz, process
 from datetime import datetime, timedelta
 from io import BytesIO
 
+# Form input untuk nama-nama jabatan
+with st.form("jabatan_form"):
+    st.write("Masukkan nama-nama untuk masing-masing jabatan (opsional):")
+    manager_names = st.text_area("Nama Manager (pisahkan dengan koma)", "").split(',')
+    asmen_names = st.text_area("Nama Asmen (pisahkan dengan koma)", "").split(',')
+    admin_names = st.text_area("Nama Admin/FSA (pisahkan dengan koma)", "").split(',')
+    mis_names = st.text_area("Nama MIS/MSA (pisahkan dengan koma)", "").split(',')
+    submitted = st.form_submit_button("Simpan")
+
+if submitted:
+    st.success("Daftar nama berhasil disimpan!")
+
+custom_keywords = {
+    'ASMEN': [name.strip().lower() for name in asmen_names],
+    'ADMIN': [name.strip().lower() for name in admin_names],
+    'MIS': [name.strip().lower() for name in mis_names],
+    'MANAGER': [name.strip().lower() for name in manager_names]
+}
 
 def create_weekly_ranges(start_date, end_date):
     """Membuat list range mingguan dari tanggal awal sampai akhir"""
@@ -180,25 +198,6 @@ st.write('''Buatlah data baru berisikan kolom | VOUCHER NO. | TRANS. DATE | DESC
 st.write('''Untuk penamaan file jadi BBM.xlsx, untuk kolom debit di ubah ke Numerik bukan Accounting! Karena nilai nol akan terbaca tanda "-" bukan angkan nol "0".''')
 st.write('''Input tanggal awal pengecekkan hari senin, misal pengecekkan dari Januari 2025 s.d Desember 2025, maka pilih tanggal awalnya hari senin di minggu itu, jadi diinput tanggal 30 Desember 2024 (karena tanggal 1 hari rabu, dan tanggal 30 Hari Senin di minggu itu.''')
 st.write('''Ada beberapa cabang yang tidak menambahkan deskripsi jabatan, mohon di cek terlebih dahulu sebelum di eksekusi dengan tools ini dan diisi manual untuk jabatan nya. Misalnya | Dibayar BBM untuk transport (irfan) |, setelah kata transport tambahkan manual jabatan dengan nama tersebut, sehingga menjadi | Dibayar BBM untuk transport asmen (irfan) |''')
-
-# Form input untuk nama-nama jabatan
-with st.form("jabatan_form"):
-    st.write("Masukkan nama-nama untuk masing-masing jabatan (opsional):")
-    manager_names = st.text_area("Nama Manager (pisahkan dengan koma)", "").split(',')
-    asmen_names = st.text_area("Nama Asmen (pisahkan dengan koma)", "").split(',')
-    admin_names = st.text_area("Nama Admin/FSA (pisahkan dengan koma)", "").split(',')
-    mis_names = st.text_area("Nama MIS/MSA (pisahkan dengan koma)", "").split(',')
-    submitted = st.form_submit_button("Simpan")
-
-if submitted:
-    st.success("Daftar nama berhasil disimpan!")
-
-custom_keywords = {
-    'ASMEN': [name.strip().lower() for name in asmen_names],
-    'ADMIN': [name.strip().lower() for name in admin_names],
-    'MIS': [name.strip().lower() for name in mis_names],
-    'MANAGER': [name.strip().lower() for name in manager_names]
-}
 
 # Date input
 start_date = st.date_input(
