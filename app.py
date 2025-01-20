@@ -11,6 +11,7 @@ st.write('''Buatlah data baru berisikan kolom | VOUCHER NO. | TRANS. DATE | DESC
 st.write('''Untuk penamaan file jadi BBM.xlsx, untuk kolom debit di ubah ke Numerik bukan Accounting! Karena nilai nol akan terbaca tanda "-" bukan angkan nol "0".''')
 st.write('''Input tanggal awal pengecekkan hari senin, misal pengecekkan dari Januari 2025 s.d Desember 2025, maka pilih tanggal awalnya hari senin di minggu itu, jadi diinput tanggal 30 Desember 2024 (karena tanggal 1 hari rabu, dan tanggal 30 Hari Senin di minggu itu.''')
 st.write('''Ada beberapa cabang yang tidak menambahkan deskripsi jabatan, mohon di cek terlebih dahulu sebelum di eksekusi dengan tools ini dan diisi manual untuk jabatan nya. Misalnya | Dibayar BBM untuk transport (irfan) |, setelah kata transport tambahkan manual jabatan dengan nama tersebut, sehingga menjadi | Dibayar BBM untuk transport asmen (irfan) |''')
+st.write('''Untuk lainya input kata "dan"''')
 
 # Form input untuk nama-nama jabatan
 with st.form("jabatan_form"):
@@ -19,6 +20,7 @@ with st.form("jabatan_form"):
     asmen_names = st.text_area("Nama Asmen (pisahkan dengan koma)", "").split(',')
     admin_names = st.text_area("Nama Admin/FSA (pisahkan dengan koma)", "").split(',')
     mis_names = st.text_area("Nama MIS/MSA (pisahkan dengan koma)", "").split(',')
+    lainya_names = st.text_area("Nama lainya (pisahkan dengan koma)", "").split(',')
     submitted = st.form_submit_button("Simpan")
 
 if submitted:
@@ -29,7 +31,8 @@ custom_keywords = {
     'MANAGER': [name.strip().lower() for name in manager_names if name.strip()],
     'ASMEN': [name.strip().lower() for name in asmen_names if name.strip()],
     'ADMIN': [name.strip().lower() for name in admin_names if name.strip()],
-    'MIS': [name.strip().lower() for name in mis_names if name.strip()]
+    'MIS': [name.strip().lower() for name in mis_names if name.strip()],
+    'LAINYA': [name.strip().lower() for name in lainya_names if name.strip()],
 }
 
 # Date input
