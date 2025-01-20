@@ -57,11 +57,11 @@ def categorize_description(description, custom_keywords):
 
     # Fallback ke keyword default jika tidak ada input nama atau tidak ditemukan kecocokan
     default_keywords = {
-        'MANAGER': ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm'],
         'ASMEN': ['asisten', 'assistant', 'asmen', 'assisten'],
         'ADMIN': ['admin', 'administrasi', 'fsa'],
         'MIS': ['mis', 'msa'],
         'STAF LAPANG': ['staf', 'staf lapang', 'staff lapang', 'staf lapangan', 'staff', 'orang'],
+        'MANAGER': ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm'],
         'LAINYA': ['genset', 'jenset']
     }
 
@@ -81,8 +81,6 @@ def process_transactions(df, start_date):
     
     # Add category column
     df['CATEGORY'] = df['DESCRIPTION'].apply(lambda description: categorize_description(description, custom_keywords))
-
-    
     
     # Tampilkan hasil kategorisasi
     st.write("Detail Kategorisasi:")
