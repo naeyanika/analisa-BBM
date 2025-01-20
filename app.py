@@ -66,6 +66,7 @@ def categorize_description(description, custom_keywords):
         'MIS': ['mis', 'msa'],
         'ADMIN': ['admin', 'administrasi', 'fsa'],
         'STAF LAPANG': ['staf', 'staf lapang', 'staff lapang', 'staf lapangan', 'staff', 'orang'],
+        'MANAGER': ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm'],
         'LAINYA': ['genset', 'jenset']
     }
     
