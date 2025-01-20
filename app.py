@@ -49,30 +49,31 @@ def is_similar(text, keywords, threshold=90):
 def categorize_description(description, custom_keywords):
     description = str(description).lower()
     
-    # 1. Cek MANAGER terlebih dahulu dengan threshold tinggi
-    manager_keywords = ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm']
-    if is_similar(description, manager_keywords, threshold=80):
-        return 'MANAGER'
-    
-    # 2. Cek asmen
+    #Cek asmen
     asmen_specific = ['asisten', 'assistant', 'asmen', 'assisten']
     if is_similar(description, asmen_specific, threshold=90):
         return 'ASMEN'
     
-    # 3. Cek MIS
+    #Cek MIS
     mis_keywords = ['mis', 'msa']
     if is_similar(description, mis_keywords, threshold=90):
         return 'MIS'
     
-    # 4. Cek STAF LAPANG
+    #Cek STAF LAPANG
     staf_keywords = ['staf', 'staf lapang', 'staff lapang', 'staf lapangan', 'staff', 'orang']
     if is_similar(description, staf_keywords, threshold=90):
         return 'STAF LAPANG'
     
-    # 5. Cek ADMIN
+    #Cek ADMIN
     admin_keywords = ['admin', 'administrasi', 'fsa']
     if is_similar(description, admin_keywords, threshold=90):
         return 'ADMIN'
+
+    # Cek Manajer
+    manager_keywords = ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm']
+    if is_similar(description, manager_keywords, threshold=100):
+        return 'MANAGER'
+    
     
     # 6. Cek custom keywords
     for category, keywords in custom_keywords.items():
