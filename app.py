@@ -79,7 +79,7 @@ def categorize_description(description, custom_keywords):
     if is_similar(description, ['staf', 'staf lapang', 'staff lapang', 'staf lapangan', 'staff', 'orang'], threshold=85):
         return 'STAF LAPANG'
     
-    if is_similar(description, ['admin', 'administrasi', 'fsa'], threshold=90):
+    if is_similar(description, ['admin', 'administrasi', 'fsa', 'adm'], threshold=90):
         return 'ADMIN'
     
     if is_similar(description, ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm'], threshold=85):
