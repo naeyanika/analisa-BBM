@@ -96,7 +96,12 @@ def categorize_description(description):
             'bm'
         ]
     }
-    
+
+     for category, keywords in custom_keywords.items():
+        if category not in ['LAINYA']:  
+            if is_similar(description, keywords):
+                return category
+                
     # Cek kategori lainnya
     for category, keywords in categories.items():
         if is_similar(description, keywords):
@@ -211,14 +216,6 @@ with st.form("jabatan_form"):
 
 if submitted:
     st.success("Daftar nama berhasil disimpan!")
-
-custom_keywords = {
-    'MANAGER': [name.strip().lower() for name in manager_names],
-    'ASMEN': [name.strip().lower() for name in asmen_names],
-    'ADMIN': [name.strip().lower() for name in admin_names],
-    'MIS': [name.strip().lower() for name in mis_names]
-}
-
 
 
 # Date input
