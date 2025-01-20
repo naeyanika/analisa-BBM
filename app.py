@@ -48,6 +48,12 @@ def is_similar(text, keywords, threshold=90):
 
 def categorize_description(description, custom_keywords):
     description = str(description).lower()
+
+    #Cek custom keywords
+    for category, keywords in custom_keywords.items():
+        if keywords:
+            if is_similar(description, keywords, threshold=100):
+                return category
     
     #Cek Asmen
     asmen_specific = ['asisten', 'assistant', 'asmen', 'assisten']
@@ -68,12 +74,6 @@ def categorize_description(description, custom_keywords):
     staf_keywords = ['staf', 'staf lapang', 'staff lapang', 'staf lapangan', 'staff', 'orang']
     if is_similar(description, staf_keywords, threshold=85):
         return 'STAF LAPANG'
-    
-    #Cek custom keywords
-    for category, keywords in custom_keywords.items():
-        if keywords:
-            if is_similar(description, keywords, threshold=100):
-                return category
 
     # Cek Manajer
     manager_keywords = ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm']
