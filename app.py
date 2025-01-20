@@ -56,7 +56,7 @@ def categorize_description(description, custom_keywords):
 
     #Cek MIS
     mis_keywords = ['mis', 'msa']
-    if is_similar(description, mis_keywords, threshold=80):
+    if is_similar(description, mis_keywords, threshold=85):
         return 'MIS'
         
     #Cek custom keywords
@@ -72,12 +72,12 @@ def categorize_description(description, custom_keywords):
 
     # Cek Manajer
     manager_keywords = ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm']
-    if is_similar(description, manager_keywords, threshold=95):
+    if is_similar(description, manager_keywords, threshold=85):
         return 'MANAGER'
 
     #Cek ADMIN
     admin_keywords = ['admin', 'administrasi', 'fsa']
-    if is_similar(description, admin_keywords, threshold=90):
+    if is_similar(description, admin_keywords, threshold=85):
         return 'ADMIN'
     
 
