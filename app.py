@@ -65,7 +65,7 @@ def categorize_description(description, custom_keywords):
     
     # Cek kategori prioritas kedua dengan threshold 90
     for category, keywords in categories.items():
-        if is_similar(description, keywords, threshold=90):  # Naikkan threshold
+        if is_similar(description, keywords, threshold=95):  # Naikkan threshold
             return category
     
     # 3. Cek custom keywords (nama-nama yang diinput)
@@ -76,7 +76,7 @@ def categorize_description(description, custom_keywords):
     
     # 4. Cek kategori MANAGER dengan threshold 85
     manager_keywords = ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm']
-    if is_similar(description, manager_keywords, threshold=85):
+    if is_similar(description, manager_keywords, threshold=90):
         return 'MANAGER'
     
     return 'LAINYA'
