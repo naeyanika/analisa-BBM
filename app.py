@@ -4,18 +4,6 @@ from thefuzz import fuzz, process
 from datetime import datetime, timedelta
 from io import BytesIO
 
-# Form input untuk nama-nama jabatan
-with st.form("jabatan_form"):
-    st.write("Masukkan nama-nama untuk masing-masing jabatan (opsional):")
-    manager_names = st.text_area("Nama Manager (pisahkan dengan koma)", "").split(',')
-    asmen_names = st.text_area("Nama Asmen (pisahkan dengan koma)", "").split(',')
-    admin_names = st.text_area("Nama Admin/FSA (pisahkan dengan koma)", "").split(',')
-    mis_names = st.text_area("Nama MIS/MSA (pisahkan dengan koma)", "").split(',')
-    submitted = st.form_submit_button("Simpan")
-
-if submitted:
-    st.success("Daftar nama berhasil disimpan!")
-
 custom_keywords = {
     'ASMEN': [name.strip().lower() for name in asmen_names],
     'ADMIN': [name.strip().lower() for name in admin_names],
@@ -207,6 +195,19 @@ start_date = st.date_input(
 
 # File uploader for Excel
 uploaded_file = st.file_uploader("Upload file Excel transaksi:", type=['xlsx', 'xls'])
+
+# Form input untuk nama-nama jabatan
+with st.form("jabatan_form"):
+    st.write("Masukkan nama-nama untuk masing-masing jabatan (opsional):")
+    manager_names = st.text_area("Nama Manager (pisahkan dengan koma)", "").split(',')
+    asmen_names = st.text_area("Nama Asmen (pisahkan dengan koma)", "").split(',')
+    admin_names = st.text_area("Nama Admin/FSA (pisahkan dengan koma)", "").split(',')
+    mis_names = st.text_area("Nama MIS/MSA (pisahkan dengan koma)", "").split(',')
+    submitted = st.form_submit_button("Simpan")
+
+if submitted:
+    st.success("Daftar nama berhasil disimpan!")
+
 
 if uploaded_file is not None:
     try:
