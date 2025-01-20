@@ -97,7 +97,7 @@ def categorize_description(description):
         ]
     }
 
-     for category, keywords in custom_keywords.items():
+    for category, keywords in custom_keywords.items():
         if category not in ['LAINYA']:  
             if is_similar(description, keywords):
                 return category
