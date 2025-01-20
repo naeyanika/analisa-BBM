@@ -47,12 +47,6 @@ def is_similar(text, keywords, threshold=90):  # Turunkan threshold ke 80
     return False
 
 def categorize_description(description, custom_keywords):
-    """Mengkategorikan description dengan prioritas:
-    1. Fuzzy matching untuk asmen (threshold 85)
-    2. Kategori MIS, ADMIN, STAF LAPANG, LAINYA
-    3. Custom keywords (nama-nama yang diinput)
-    4. Kategori MANAGER
-    """
     description = str(description).lower()
     
     # 1. Cek spesifik untuk "asmen" terlebih dahulu
@@ -61,32 +55,31 @@ def categorize_description(description, custom_keywords):
         if is_similar(description, [keyword], threshold=85):
             return 'ASMEN'
     
-    # 2. Dictionary untuk kategori prioritas kedua
+    # 2. Dictionary untuk kategori prioritas kedua (dengan threshold lebih tinggi)
     categories = {
         'MIS': ['mis', 'msa'],
         'ADMIN': ['admin', 'administrasi', 'fsa'],
         'STAF LAPANG': ['staf', 'staf lapang', 'staff lapang', 'staf lapangan', 'staff', 'orang'],
-        'MANAGER': ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm'],
         'LAINYA': ['genset', 'jenset']
     }
     
-    # Cek kategori prioritas kedua
+    # Cek kategori prioritas kedua dengan threshold 90
     for category, keywords in categories.items():
-        if is_similar(description, keywords):
+        if is_similar(description, keywords, threshold=90):  # Naikkan threshold
             return category
     
     # 3. Cek custom keywords (nama-nama yang diinput)
     for category, keywords in custom_keywords.items():
-        if keywords:  # Hanya cek jika ada input nama
+        if keywords:
             if is_similar(description, keywords):
                 return category
     
-    # 4. Cek kategori MANAGER terakhir
+    # 4. Cek kategori MANAGER dengan threshold 85
     manager_keywords = ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm']
-    if is_similar(description, manager_keywords):
+    if is_similar(description, manager_keywords, threshold=85):
         return 'MANAGER'
     
-    return 'LAINYA'    
+    return 'LAINYA'
 
 def process_transactions(df, start_date):
     # Convert start_date to datetime
