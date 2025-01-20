@@ -12,15 +12,6 @@ st.write('''Untuk penamaan file jadi BBM.xlsx, untuk kolom debit di ubah ke Nume
 st.write('''Input tanggal awal pengecekkan hari senin, misal pengecekkan dari Januari 2025 s.d Desember 2025, maka pilih tanggal awalnya hari senin di minggu itu, jadi diinput tanggal 30 Desember 2024 (karena tanggal 1 hari rabu, dan tanggal 30 Hari Senin di minggu itu.''')
 st.write('''Ada beberapa cabang yang tidak menambahkan deskripsi jabatan, mohon di cek terlebih dahulu sebelum di eksekusi dengan tools ini dan diisi manual untuk jabatan nya. Misalnya | Dibayar BBM untuk transport (irfan) |, setelah kata transport tambahkan manual jabatan dengan nama tersebut, sehingga menjadi | Dibayar BBM untuk transport asmen (irfan) |''')
 
-# Date input
-start_date = st.date_input(
-    "Pilih tanggal awal (Senin):",
-    datetime.now()
-).strftime('%d/%m/%Y')
-
-# File uploader for Excel
-uploaded_file = st.file_uploader("Upload file Excel transaksi:", type=['xlsx', 'xls'])
-
 # Form input untuk nama-nama jabatan
 with st.form("jabatan_form"):
     st.write("Masukkan nama-nama untuk masing-masing jabatan (opsional):")
@@ -33,101 +24,72 @@ with st.form("jabatan_form"):
 if submitted:
     st.success("Daftar nama berhasil disimpan!")
 
+# Custom keywords initialization
 custom_keywords = {
-    'ASMEN': [name.strip().lower() for name in asmen_names],
-    'ADMIN': [name.strip().lower() for name in admin_names],
-    'MIS': [name.strip().lower() for name in mis_names],
-    'MANAGER': [name.strip().lower() for name in manager_names]
+    'MANAGER': [name.strip().lower() for name in manager_names if name.strip()],
+    'ASMEN': [name.strip().lower() for name in asmen_names if name.strip()],
+    'ADMIN': [name.strip().lower() for name in admin_names if name.strip()],
+    'MIS': [name.strip().lower() for name in mis_names if name.strip()]
 }
 
-if uploaded_file is not None:
-    try:
-        df = pd.read_excel(uploaded_file)
-        st.write("Preview data:")
-        st.write(df.head())
-        
+# Date input
+start_date = st.date_input(
+    "Pilih tanggal awal (Senin):",
+    datetime.now()
+).strftime('%d/%m/%Y')
 
-def create_weekly_ranges(start_date, end_date):
-    """Membuat list range mingguan dari tanggal awal sampai akhir"""
-    current = start_date
-    weekly_ranges = []
-    while current <= end_date:
-        week_end = current + timedelta(days=6)
-        weekly_ranges.append((current, week_end))
-        current = current + timedelta(days=7)
-    return weekly_ranges
-    
+# File uploader
+uploaded_file = st.file_uploader("Upload file Excel transaksi:", type=['xlsx', 'xls'])
+
 def is_similar(text, keywords, threshold=85):
-    """
-    Helper function untuk mengecek kemiripan string menggunakan fuzzy matching
-    threshold: nilai minimum kemiripan (0-100)
-    """
+    """Helper function untuk mengecek kemiripan string"""
     text = text.lower()
     
-    # Direct match first (exact matching)
+    # Direct match first
     if any(keyword.lower() in text for keyword in keywords):
         return True
     
-    # Fuzzy matching untuk menangani typo
+    # Fuzzy matching
     for keyword in keywords:
         keyword = keyword.lower()
-        # Ratio biasa - untuk typo umum
-        ratio = fuzz.ratio(text, keyword)
-        if ratio >= threshold:
+        if any(ratio >= threshold for ratio in [
+            fuzz.ratio(text, keyword),
+            fuzz.partial_ratio(text, keyword),
+            fuzz.token_sort_ratio(text, keyword)
+        ]):
             return True
-            
-        # Partial ratio - untuk substring matching
-        partial_ratio = fuzz.partial_ratio(text, keyword)
-        if partial_ratio >= threshold:
-            return True
-            
-        # Token sort ratio - untuk kata yang urutannya berbeda
-        token_ratio = fuzz.token_sort_ratio(text, keyword)
-        if token_ratio >= threshold:
-            return True
-    
     return False
 
 def categorize_description(description, custom_keywords):
+    """Kategorisasi dengan prioritas yang tepat"""
     description = str(description).lower()
     
-    #Cek Asmen
-    asmen_specific = ['asisten', 'assistant', 'asmen', 'assisten']
-    if is_similar(description, asmen_specific, threshold=90):
-        return 'ASMEN'
-
-    #Cek MIS
-    mis_keywords = ['mis', 'msa']
-    if is_similar(description, mis_keywords, threshold=85):
-        return 'MIS'
-
-    #Cek STAF LAPANG
-    staf_keywords = ['staf', 'staf lapang', 'staff lapang', 'staf lapangan', 'staff', 'orang']
-    if is_similar(description, staf_keywords, threshold=85):
-        return 'STAF LAPANG'
-
-    #Cek ADMIN
-    admin_keywords = ['admin', 'administrasi', 'fsa']
-    if is_similar(description, admin_keywords, threshold=90):
-        return 'ADMIN'
-
-    # Cek Manajer
-    manager_keywords = ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm']
-    if is_similar(description, manager_keywords, threshold=80):
-        return 'MANAGER'
-        
-    #Cek custom keywords
+    # 1. Cek custom keywords (nama-nama yang diinput) terlebih dahulu
     for category, keywords in custom_keywords.items():
-        if keywords:
-            if is_similar(description, keywords, threshold=80):
-                return category
+        if keywords and is_similar(description, keywords, threshold=85):
+            return category
     
-    # Cek LAINYA
-    lainya_keywords = ['genset', 'jenset']
-    if is_similar(description, lainya_keywords, threshold=90):
+    # 2. Cek kategori berdasarkan jabatan
+    if is_similar(description, ['asisten', 'assistant', 'asmen', 'assisten'], threshold=90):
+        return 'ASMEN'
+    
+    if is_similar(description, ['mis', 'msa'], threshold=85):
+        return 'MIS'
+    
+    if is_similar(description, ['staf', 'staf lapang', 'staff lapang', 'staf lapangan', 'staff', 'orang'], threshold=85):
+        return 'STAF LAPANG'
+    
+    if is_similar(description, ['admin', 'administrasi', 'fsa'], threshold=90):
+        return 'ADMIN'
+    
+    if is_similar(description, ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm'], threshold=85):
+        return 'MANAGER'
+    
+    if is_similar(description, ['genset', 'jenset'], threshold=90):
         return 'LAINYA'
     
     return 'LAINYA'
+    
 def process_transactions(df, start_date):
     # Convert start_date to datetime
     start_date = datetime.strptime(start_date, '%d/%m/%Y')
