@@ -15,7 +15,7 @@ def create_weekly_ranges(start_date, end_date):
         current = current + timedelta(days=7)
     return weekly_ranges
     
-def is_similar(text, keywords, threshold=90):
+def is_similar(text, keywords, threshold=80):
     """
     Helper function untuk mengecek kemiripan string menggunakan fuzzy matching
     threshold: nilai minimum kemiripan (0-100)
