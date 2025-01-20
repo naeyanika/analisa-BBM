@@ -77,7 +77,7 @@ def categorize_description(description, custom_keywords):
     #Cek custom keywords
     for category, keywords in custom_keywords.items():
         if keywords:
-            if is_similar(description, keywords, threshold=90):
+            if is_similar(description, keywords, threshold=80):
                 return category
     
     # Cek LAINYA
