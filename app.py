@@ -47,31 +47,45 @@ def is_similar(text, keywords, threshold=80):  # Turunkan threshold ke 80
     return False
 
 def categorize_description(description, custom_keywords):
-    """Mengkategorikan description dengan prioritas yang lebih tepat"""
+    """Mengkategorikan description dengan prioritas:
+    1. Fuzzy matching untuk asmen (threshold 85)
+    2. Kategori MIS, ADMIN, STAF LAPANG, LAINYA
+    3. Custom keywords (nama-nama yang diinput)
+    4. Kategori MANAGER
+    """
     description = str(description).lower()
     
-    # 1. Cek custom keywords (nama-nama) terlebih dahulu
+    # 1. Cek spesifik untuk "asmen" terlebih dahulu
+    asmen_specific = ['asisten', 'assistant', 'asmen', 'assisten']
+    for keyword in asmen_specific:
+        if is_similar(description, [keyword], threshold=85):
+            return 'ASMEN'
+    
+    # 2. Dictionary untuk kategori prioritas kedua
+    categories = {
+        'MIS': ['mis', 'msa'],
+        'ADMIN': ['admin', 'administrasi', 'fsa'],
+        'STAF LAPANG': ['staf', 'staf lapang', 'staff lapang', 'staf lapangan', 'staff', 'orang'],
+        'LAINYA': ['genset', 'jenset']
+    }
+    
+    # Cek kategori prioritas kedua
+    for category, keywords in categories.items():
+        if is_similar(description, keywords):
+            return category
+    
+    # 3. Cek custom keywords (nama-nama yang diinput)
     for category, keywords in custom_keywords.items():
         if keywords:  # Hanya cek jika ada input nama
             if is_similar(description, keywords):
                 return category
     
-    # 2. Default keywords dengan fuzzy matching
-    default_keywords = {
-        'STAF LAPANG': ['staf lapang', 'staff lapang', 'staf lapangan', 'staff lapangan', 'staf', 'staff', 'orang'],
-        'MANAGER': ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm'],
-        'ASMEN': ['asisten', 'assistant', 'asmen', 'assisten'],
-        'ADMIN': ['admin', 'administrasi', 'fsa'],
-        'MIS': ['mis', 'msa'],
-        'LAINYA': ['genset', 'jenset']
-    }
-
-    for category, keywords in default_keywords.items():
-        if is_similar(description, keywords):
-            return category
-
-    return 'LAINYA'
+    # 4. Cek kategori MANAGER terakhir
+    manager_keywords = ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm']
+    if is_similar(description, manager_keywords):
+        return 'MANAGER'
     
+    return 'LAINYA'    
 
 def process_transactions(df, start_date):
     # Convert start_date to datetime
