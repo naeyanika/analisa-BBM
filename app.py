@@ -65,7 +65,7 @@ def categorize_description(description, custom_keywords):
     
     # Cek kategori prioritas kedua dengan threshold 90
     for category, keywords in categories.items():
-        if is_similar(description, keywords, threshold=95):  # Naikkan threshold
+        if is_similar(description, keywords, threshold=100):  # Naikkan threshold
             return category
     
     # 3. Cek custom keywords (nama-nama yang diinput)
