@@ -221,9 +221,7 @@ custom_keywords = {
     'MANAGER': [name.strip().lower() for name in manager_names],
     'ASMEN': [name.strip().lower() for name in asmen_names],
     'ADMIN': [name.strip().lower() for name in admin_names],
-    'MIS': [name.strip().lower() for name in mis_names],
-    'STAF LAPANG': [name.strip().lower() for name in staf_lapang_names],
-    'LAINYA': ['genset', 'jenset']
+    'MIS': [name.strip().lower() for name in mis_names]
 }
 
 # Date input
