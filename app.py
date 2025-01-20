@@ -207,7 +207,6 @@ with st.form("jabatan_form"):
     asmen_names = st.text_area("Nama Asmen (pisahkan dengan koma)", "").split(',')
     admin_names = st.text_area("Nama Admin/FSA (pisahkan dengan koma)", "").split(',')
     mis_names = st.text_area("Nama MIS/MSA (pisahkan dengan koma)", "").split(',')
-    staf_lapang_names = st.text_area("Nama Staf Lapang (pisahkan dengan koma)", "").split(',')
     submitted = st.form_submit_button("Simpan")
 
 if submitted:
@@ -217,9 +216,7 @@ custom_keywords = {
     'MANAGER': [name.strip().lower() for name in manager_names],
     'ASMEN': [name.strip().lower() for name in asmen_names],
     'ADMIN': [name.strip().lower() for name in admin_names],
-    'MIS': [name.strip().lower() for name in mis_names],
-    'STAF LAPANG': [name.strip().lower() for name in staf_lapang_names],
-    'LAINYA': ['genset', 'jenset']
+    'MIS': [name.strip().lower() for name in mis_names]
 }
 
 
