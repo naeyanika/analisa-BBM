@@ -69,17 +69,17 @@ def categorize_description(description, custom_keywords):
     if is_similar(description, admin_keywords, threshold=90):
         return 'ADMIN'
 
-    # Cek Manajer
-    manager_keywords = ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm']
-    if is_similar(description, manager_keywords, threshold=100):
-        return 'MANAGER'
-    
-    
-    # 6. Cek custom keywords
+    #Cek custom keywords
     for category, keywords in custom_keywords.items():
         if keywords:
             if is_similar(description, keywords, threshold=90):
                 return category
+
+    # Cek Manajer
+    manager_keywords = ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm']
+    if is_similar(description, manager_keywords, threshold=100):
+        return 'MANAGER'
+
     
     # 7. Cek LAINYA
     lainya_keywords = ['genset', 'jenset']
