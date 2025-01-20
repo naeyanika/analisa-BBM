@@ -71,7 +71,7 @@ def categorize_description(description, custom_keywords):
 
     # Cek Manajer
     manager_keywords = ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm']
-    if is_similar(description, manager_keywords, threshold=100):
+    if is_similar(description, manager_keywords, threshold=80):
         return 'MANAGER'
         
     #Cek custom keywords
