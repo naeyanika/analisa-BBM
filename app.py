@@ -61,12 +61,12 @@ def categorize_description(description, custom_keywords):
     
     #Cek STAF LAPANG
     staf_keywords = ['staf', 'staf lapang', 'staff lapang', 'staf lapangan', 'staff', 'orang']
-    if is_similar(description, staf_keywords, threshold=90):
+    if is_similar(description, staf_keywords, threshold=85):
         return 'STAF LAPANG'
     
     #Cek ADMIN
     admin_keywords = ['admin', 'administrasi', 'fsa']
-    if is_similar(description, admin_keywords, threshold=90):
+    if is_similar(description, admin_keywords, threshold=85):
         return 'ADMIN'
 
     #Cek custom keywords
