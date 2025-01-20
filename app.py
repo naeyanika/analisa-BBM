@@ -45,68 +45,30 @@ def is_similar(text, keywords, threshold=90):
     
     return False
 
-# 3. Ganti fungsi categorize_description yang lama dengan yang baru:
-def categorize_description(description):
-    """Mengkategorikan description ke dalam jabatan dengan fuzzy matching untuk menangani typo"""
+def categorize_description(description, custom_keywords):
+    """Mengkategorikan description ke dalam jabatan dengan preferensi input nama dan fallback ke keyword default"""
     description = str(description).lower()
-    
-    # Cek spesifik untuk "asisten manager" terlebih dahulu
-    asmen_specific = [
-        'asisten',
-        'assistant',
-        'asmen',
-        'assisten'
-    ]
-    
-    # Jika mengandung kata asisten/assistant dan manager, prioritaskan sebagai ASMEN
-    for keyword in asmen_specific:
-        if is_similar(description, [keyword], threshold=85):
-            return 'ASMEN'
-    
-    # Dictionary untuk kategori lainnya
-    categories = {
-        'MIS': [
-            'mis',
-            'msa'
-        ],
-        'ADMIN': [
-            'admin',
-            'administrasi',
-            'fsa'
-        ],
-        'STAF LAPANG': [
-            'staf',
-            'staf lapang',
-            'staff lapang',
-            'staf lapangan',
-            'staff',
-            'orang'
-        ],
-        'LAINYA': [
-            'genset',
-            'jenset'
-        ],
-        
-         'MANAGER': [
-            'manager',
-            'manajer',
-            'branch manager',
-            'kepala cabang',
-            'mc',
-            'bm'
-        ]
-    }
 
+    # Prioritaskan pencocokan dengan input nama jabatan (custom keywords)
     for category, keywords in custom_keywords.items():
-        if category not in ['LAINYA']:  
+        if keywords:  # Hanya cek jika ada input nama
             if is_similar(description, keywords):
                 return category
-                
-    # Cek kategori lainnya
-    for category, keywords in categories.items():
+
+    # Fallback ke keyword default jika tidak ada input nama atau tidak ditemukan kecocokan
+    default_keywords = {
+        'MANAGER': ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm'],
+        'ASMEN': ['asisten', 'assistant', 'asmen', 'assisten'],
+        'ADMIN': ['admin', 'administrasi', 'fsa'],
+        'MIS': ['mis', 'msa'],
+        'STAF LAPANG': ['staf', 'staf lapang', 'staff lapang', 'staf lapangan', 'staff', 'orang'],
+        'LAINYA': ['genset', 'jenset']
+    }
+
+    for category, keywords in default_keywords.items():
         if is_similar(description, keywords):
             return category
-    
+
     return 'LAINYA'
 
 
