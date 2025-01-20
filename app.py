@@ -177,11 +177,11 @@ def to_excel(df):
     output.seek(0)
     return output
     
-        if st.button('Proses Analisa BBM'):
-        results_df = process_transactions(df, start_date)
+    if st.button('Proses Analisa BBM'):
+    results_df = process_transactions(df, start_date)
             
-        st.write("Hasil perhitungan:")
-        st.write(results_df)   
+    st.write("Hasil perhitungan:")
+    st.write(results_df)   
             
             # Create Excel download button
             excel_file = to_excel(results_df)
