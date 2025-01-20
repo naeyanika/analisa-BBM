@@ -22,13 +22,18 @@ def is_similar(text, keywords, threshold=80):  # Turunkan threshold ke 80
     """
     text = text.lower()
     
-    # Direct match first (exact matching)
+    # Direct match first (lebih cepat)
     if any(keyword.lower() in text for keyword in keywords):
         return True
     
     # Fuzzy matching untuk menangani typo
     for keyword in keywords:
         keyword = keyword.lower()
+        # Ratio biasa - untuk typo umum
+        ratio = fuzz.ratio(text, keyword)
+        if ratio >= threshold:
+            return True
+            
         # Partial ratio - untuk substring matching
         partial_ratio = fuzz.partial_ratio(text, keyword)
         if partial_ratio >= threshold:
@@ -42,28 +47,29 @@ def is_similar(text, keywords, threshold=80):  # Turunkan threshold ke 80
     return False
 
 def categorize_description(description, custom_keywords):
-    """Mengkategorikan description dengan prioritas yang lebih jelas"""
+    """Mengkategorikan description dengan prioritas yang lebih tepat"""
     description = str(description).lower()
     
-    # 1. Cek nama-nama custom terlebih dahulu
+    # 1. Cek custom keywords (nama-nama) terlebih dahulu
     for category, keywords in custom_keywords.items():
         if keywords:  # Hanya cek jika ada input nama
             if is_similar(description, keywords):
                 return category
     
-    # 2. Cek keywords berdasarkan prioritas
-    if 'staf lapang' in description or 'staff lapang' in description:
-        return 'STAF LAPANG'
-    elif any(word in description for word in ['manager', 'manajer']):
-        return 'MANAGER'
-    elif any(word in description for word in ['asmen', 'asisten', 'assistant']):
-        return 'ASMEN'
-    elif any(word in description for word in ['admin', 'administrasi']):
-        return 'ADMIN'
-    elif any(word in description for word in ['mis', 'msa']):
-        return 'MIS'
-    
-    # 3. Jika tidak ada yang cocok
+    # 2. Default keywords dengan fuzzy matching
+    default_keywords = {
+        'STAF LAPANG': ['staf lapang', 'staff lapang', 'staf lapangan', 'staff lapangan', 'staf', 'staff', 'orang'],
+        'MANAGER': ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm'],
+        'ASMEN': ['asisten', 'assistant', 'asmen', 'assisten'],
+        'ADMIN': ['admin', 'administrasi', 'fsa'],
+        'MIS': ['mis', 'msa'],
+        'LAINYA': ['genset', 'jenset']
+    }
+
+    for category, keywords in default_keywords.items():
+        if is_similar(description, keywords):
+            return category
+
     return 'LAINYA'
     
 
