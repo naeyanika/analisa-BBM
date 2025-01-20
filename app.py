@@ -15,24 +15,20 @@ def create_weekly_ranges(start_date, end_date):
         current = current + timedelta(days=7)
     return weekly_ranges
     
-def is_similar(text, keywords, threshold=80):
+def is_similar(text, keywords, threshold=80):  # Turunkan threshold ke 80
     """
     Helper function untuk mengecek kemiripan string menggunakan fuzzy matching
     threshold: nilai minimum kemiripan (0-100)
     """
     text = text.lower()
     
-    # Direct match first (lebih cepat)
-    if any(keyword in text for keyword in keywords):
+    # Direct match first (exact matching)
+    if any(keyword.lower() in text for keyword in keywords):
         return True
     
     # Fuzzy matching untuk menangani typo
     for keyword in keywords:
-        # Ratio biasa - untuk typo umum
-        ratio = fuzz.ratio(text, keyword)
-        if ratio >= threshold:
-            return True
-            
+        keyword = keyword.lower()
         # Partial ratio - untuk substring matching
         partial_ratio = fuzz.partial_ratio(text, keyword)
         if partial_ratio >= threshold:
@@ -49,23 +45,26 @@ def categorize_description(description, custom_keywords):
     """Mengkategorikan description dengan prioritas yang lebih jelas"""
     description = str(description).lower()
     
-    # 1. Cek custom keywords (nama-nama spesifik) terlebih dahulu
+    # 1. Cek nama-nama custom terlebih dahulu
     for category, keywords in custom_keywords.items():
         if keywords:  # Hanya cek jika ada input nama
             if is_similar(description, keywords):
                 return category
     
-    # 2. Cek keywords spesifik dalam description
+    # 2. Cek keywords berdasarkan prioritas
     if 'staf lapang' in description or 'staff lapang' in description:
         return 'STAF LAPANG'
-    if 'manager' in description:
+    elif any(word in description for word in ['manager', 'manajer']):
         return 'MANAGER'
-    if 'asmen' in description or 'asisten' in description:
+    elif any(word in description for word in ['asmen', 'asisten', 'assistant']):
         return 'ASMEN'
-    if 'admin' in description:
+    elif any(word in description for word in ['admin', 'administrasi']):
         return 'ADMIN'
-    if 'mis' in description or 'msa' in description:
+    elif any(word in description for word in ['mis', 'msa']):
         return 'MIS'
+    
+    # 3. Jika tidak ada yang cocok
+    return 'LAINYA'
     
     # 3. Jika masih tidak ada yang cocok, baru gunakan fuzzy matching
     default_keywords = {
