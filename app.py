@@ -46,26 +46,39 @@ def is_similar(text, keywords, threshold=99):
     return False
 
 def categorize_description(description, custom_keywords):
+    """Mengkategorikan description dengan prioritas yang lebih jelas"""
     description = str(description).lower()
     
-    # Cek custom keywords terlebih dahulu
+    # 1. Cek custom keywords (nama-nama spesifik) terlebih dahulu
     for category, keywords in custom_keywords.items():
         if keywords:  # Hanya cek jika ada input nama
             if is_similar(description, keywords):
                 return category
-
-    # Baru cek default keywords jika tidak ada match di custom keywords
+    
+    # 2. Cek keywords spesifik dalam description
+    if 'staf lapang' in description or 'staff lapang' in description:
+        return 'STAF LAPANG'
+    if 'manager' in description:
+        return 'MANAGER'
+    if 'asmen' in description or 'asisten' in description:
+        return 'ASMEN'
+    if 'admin' in description:
+        return 'ADMIN'
+    if 'mis' in description or 'msa' in description:
+        return 'MIS'
+    
+    # 3. Jika masih tidak ada yang cocok, baru gunakan fuzzy matching
     default_keywords = {
         'ASMEN': ['asisten', 'assistant', 'asmen', 'assisten'],
         'ADMIN': ['admin', 'administrasi', 'fsa'],
         'MIS': ['mis', 'msa'],
-        'STAF LAPANG': ['staf', 'staf lapang', 'staff lapang', 'staf lapangan', 'staff', 'orang'],
+        'STAF LAPANG': ['staf', 'staff', 'orang'],
         'MANAGER': ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm'],
         'LAINYA': ['genset', 'jenset']
     }
 
     for category, keywords in default_keywords.items():
-        if is_similar(description, keywords):
+        if any(is_similar(description, [keyword]) for keyword in keywords):
             return category
 
     return 'LAINYA'
