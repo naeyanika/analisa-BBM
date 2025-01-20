@@ -15,14 +15,14 @@ def create_weekly_ranges(start_date, end_date):
         current = current + timedelta(days=7)
     return weekly_ranges
     
-def is_similar(text, keywords, threshold=90):  # Turunkan threshold ke 80
+def is_similar(text, keywords, threshold=90):
     """
     Helper function untuk mengecek kemiripan string menggunakan fuzzy matching
     threshold: nilai minimum kemiripan (0-100)
     """
     text = text.lower()
     
-    # Direct match first (lebih cepat)
+    # Direct match first (exact matching)
     if any(keyword.lower() in text for keyword in keywords):
         return True
     
@@ -49,38 +49,43 @@ def is_similar(text, keywords, threshold=90):  # Turunkan threshold ke 80
 def categorize_description(description, custom_keywords):
     description = str(description).lower()
     
-    # 1. Cek spesifik untuk "asmen" terlebih dahulu
-    asmen_specific = ['asisten', 'assistant', 'asmen', 'assisten']
-    for keyword in asmen_specific:
-        if is_similar(description, [keyword], threshold=85):
-            return 'ASMEN'
-    
-    # 2. Dictionary untuk kategori prioritas kedua (dengan threshold lebih tinggi)
-    categories = {
-        'MIS': ['mis', 'msa'],
-        'ADMIN': ['admin', 'administrasi', 'fsa'],
-        'STAF LAPANG': ['staf', 'staf lapang', 'staff lapang', 'staf lapangan', 'staff', 'orang'],
-        'LAINYA': ['genset', 'jenset']
-    }
-    
-    # Cek kategori prioritas kedua dengan threshold 90
-    for category, keywords in categories.items():
-        if is_similar(description, keywords, threshold=75):  # Naikkan threshold
-            return category
-    
-    # 3. Cek custom keywords (nama-nama yang diinput)
-    for category, keywords in custom_keywords.items():
-        if keywords:
-            if is_similar(description, keywords):
-                return category
-    
-    # 4. Cek kategori MANAGER dengan threshold 85
+    # 1. Cek MANAGER terlebih dahulu dengan threshold tinggi
     manager_keywords = ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm']
-    if is_similar(description, manager_keywords, threshold=95):
+    if is_similar(description, manager_keywords, threshold=90):
         return 'MANAGER'
     
+    # 2. Cek asmen
+    asmen_specific = ['asisten', 'assistant', 'asmen', 'assisten']
+    if is_similar(description, asmen_specific, threshold=90):
+        return 'ASMEN'
+    
+    # 3. Cek MIS
+    mis_keywords = ['mis', 'msa']
+    if is_similar(description, mis_keywords, threshold=90):
+        return 'MIS'
+    
+    # 4. Cek STAF LAPANG
+    staf_keywords = ['staf', 'staf lapang', 'staff lapang', 'staf lapangan', 'staff', 'orang']
+    if is_similar(description, staf_keywords, threshold=90):
+        return 'STAF LAPANG'
+    
+    # 5. Cek ADMIN
+    admin_keywords = ['admin', 'administrasi', 'fsa']
+    if is_similar(description, admin_keywords, threshold=90):
+        return 'ADMIN'
+    
+    # 6. Cek custom keywords
+    for category, keywords in custom_keywords.items():
+        if keywords:
+            if is_similar(description, keywords, threshold=90):
+                return category
+    
+    # 7. Cek LAINYA
+    lainya_keywords = ['genset', 'jenset']
+    if is_similar(description, lainya_keywords, threshold=90):
+        return 'LAINYA'
+    
     return 'LAINYA'
-
 def process_transactions(df, start_date):
     # Convert start_date to datetime
     start_date = datetime.strptime(start_date, '%d/%m/%Y')
