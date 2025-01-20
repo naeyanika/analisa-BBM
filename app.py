@@ -184,8 +184,8 @@ def to_excel(df):
     st.write(results_df)   
             
             # Create Excel download button
-            excel_file = to_excel(results_df)
-            st.download_button(
+    excel_file = to_excel(results_df)
+    st.download_button(
                 label="Download Excel",
                 data=excel_file,
                 file_name=f'tracking_bbm_{start_date.replace("/", "-")}.xlsx',
