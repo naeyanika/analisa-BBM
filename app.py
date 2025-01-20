@@ -46,29 +46,10 @@ def is_similar(text, keywords, threshold=90):
     return False
 
 def categorize_description(description, custom_keywords):
-    """Mengkategorikan description ke dalam jabatan dengan preferensi input nama dan fallback ke keyword default"""
+    """Mengkategorikan description ke dalam jabatan dengan default keywords terlebih dahulu, baru custom keywords."""
     description = str(description).lower()
-        # Cek spesifik untuk "asisten manager" terlebih dahulu
-    
-    asmen_specific = [
-        'asisten',
-        'assistant',
-        'asmen',
-        'assisten'
-    ]
-    
-    # Jika mengandung kata asisten/assistant dan manager, prioritaskan sebagai ASMEN
-    for keyword in asmen_specific:
-        if is_similar(description, [keyword], threshold=85):
-            return 'ASMEN'
-            
-    # Prioritaskan pencocokan dengan input nama jabatan (custom keywords)
-    for category, keywords in custom_keywords.items():
-        if keywords:  # Hanya cek jika ada input nama
-            if is_similar(description, keywords):
-                return category
 
-    # Fallback ke keyword default jika tidak ada input nama atau tidak ditemukan kecocokan
+    # Default keywords
     default_keywords = {
         'ASMEN': ['asisten', 'assistant', 'asmen', 'assisten'],
         'ADMIN': ['admin', 'administrasi', 'fsa'],
@@ -78,10 +59,18 @@ def categorize_description(description, custom_keywords):
         'LAINYA': ['genset', 'jenset']
     }
 
+    # Cek dengan default keywords
     for category, keywords in default_keywords.items():
         if is_similar(description, keywords):
             return category
 
+    # Cek dengan custom keywords (opsional jika ada input)
+    for category, keywords in custom_keywords.items():
+        if keywords:  # Hanya cek jika ada input nama
+            if is_similar(description, keywords):
+                return category
+
+    # Jika tidak ada kecocokan, fallback ke 'LAINYA'
     return 'LAINYA'
 
 
