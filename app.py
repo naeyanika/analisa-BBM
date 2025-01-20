@@ -89,7 +89,17 @@ def categorize_description(description, custom_keywords):
         return 'LAINYA'
     
     return 'LAINYA'
-    
+
+def create_weekly_ranges(start_date, end_date):
+    """Create list of weekly date ranges"""
+    current = start_date
+    ranges = []
+    while current <= end_date:
+        week_end = current + timedelta(days=6)
+        ranges.append((current, min(week_end, end_date)))
+        current = week_end + timedelta(days=1)
+    return ranges
+
 def process_transactions(df, start_date):
     # Convert start_date to datetime
     start_date = datetime.strptime(start_date, '%d/%m/%Y')
@@ -107,7 +117,6 @@ def process_transactions(df, start_date):
     st.dataframe(categorized_df)
     
     # Get min and max dates from data
-    min_date = df['TRANS. DATE'].min()
     max_date = df['TRANS. DATE'].max()
     
     # Create weekly ranges
@@ -176,21 +185,26 @@ def to_excel(df):
     
     output.seek(0)
     return output
-    
-    if st.button('Proses Analisa BBM'):
-        results_df = process_transactions(df, start_date)
+
+# Main execution flow
+if uploaded_file is not None:
+    try:
+        df = pd.read_excel(uploaded_file)
+        
+        if st.button('Proses Analisa BBM'):
+            results_df = process_transactions(df, start_date)
             
-    st.write("Hasil perhitungan:")
-    st.write(results_df)   
+            st.write("Hasil perhitungan:")
+            st.write(results_df)
             
             # Create Excel download button
-    excel_file = to_excel(results_df)
-    st.download_button(
+            excel_file = to_excel(results_df)
+            st.download_button(
                 label="Download Excel",
                 data=excel_file,
                 file_name=f'tracking_bbm_{start_date.replace("/", "-")}.xlsx',
                 mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
     
-            except Exception as e:
-            st.error(f"Error membaca file: {str(e)}")
+    except Exception as e:
+        st.error(f"Error membaca file: {str(e)}")
