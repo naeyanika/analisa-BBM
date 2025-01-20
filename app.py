@@ -85,7 +85,7 @@ def categorize_description(description, custom_keywords):
     if is_similar(description, ['manager', 'manajer', 'branch manager', 'kepala cabang', 'mc', 'bm'], threshold=85):
         return 'MANAGER'
     
-    if is_similar(description, ['genset', 'jenset'], threshold=90):
+    if is_similar(description, ['genset', 'jenset', 'dan'], threshold=90):
         return 'LAINYA'
     
     return 'LAINYA'
