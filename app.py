@@ -191,5 +191,5 @@ def to_excel(df):
                 file_name=f'tracking_bbm_{start_date.replace("/", "-")}.xlsx',
                 mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
-except Exception as e:
-    st.error(f"Error membaca file: {str(e)}")
+        except Exception as e:
+            st.error(f"Error membaca file: {str(e)}")
