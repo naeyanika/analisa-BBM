@@ -6,7 +6,7 @@ from io import BytesIO
 
 # Streamlit interface
 st.title('Tracking Pengeluaran BBM per Jabatan')
-st.write('''Buatlah data baru berisikan kolom | VOUCHER NO. | TRANS. DATE | DESCRIPTION | DEBIT | jika anda copypaste dari data yang didownload di mdis ijo, check terlebih dahulu bagian headernya karena pasti ada karakter spesial, jika ada hapus terlebih dahulu karakter spesial tersebut.
+st.write('''Buatlah data baru berisikan kolom | VOUCHER NO. | TRANS. DATE | ENTRY DATE | DESCRIPTION | DEBIT | jika anda copypaste dari data yang didownload di mdis ijo, check terlebih dahulu bagian headernya karena pasti ada karakter spesial, jika ada hapus terlebih dahulu karakter spesial tersebut.
 ''')
 st.write('''Untuk penamaan file jadi BBM.xlsx, untuk kolom debit di ubah ke Numerik bukan Accounting! Karena nilai nol akan terbaca tanda "-" bukan angkan nol "0".''')
 st.write('''Input tanggal awal pengecekkan hari senin, misal pengecekkan dari Januari 2025 s.d Desember 2025, maka pilih tanggal awalnya hari senin di minggu itu, jadi diinput tanggal 30 Desember 2024 (karena tanggal 1 hari rabu, dan tanggal 30 Hari Senin di minggu itu.''')
@@ -103,6 +103,19 @@ def create_weekly_ranges(start_date, end_date):
         current = week_end + timedelta(days=1)
     return ranges
 
+# Tambahkan fungsi baru di sini
+def detect_date_anomalies(df):
+    # Kode yang saya berikan sebelumnya
+
+def process_transactions(df, start_date):
+    # Existing code, tambahkan bagian deteksi anomali
+    date_anomalies = detect_date_anomalies(df)
+    
+    if date_anomalies is not None:
+        st.warning("⚠️ Terdeteksi Anomali Tanggal:")
+        st.dataframe(date_anomalies)
+
+
 def process_transactions(df, start_date):
     # Convert start_date to datetime
     start_date = datetime.strptime(start_date, '%d/%m/%Y')
@@ -156,52 +169,76 @@ def process_transactions(df, start_date):
     
     return pd.DataFrame(results)
 
-def to_excel(df):
+def to_excel(categorized_df, weekly_results_df, date_anomalies_df):
     output = BytesIO()
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-        df.to_excel(writer, sheet_name='Sheet1', index=False)
-        workbook = writer.book
-        worksheet = writer.sheets['Sheet1']
+        # Sheet 1: Kategorisasi
+        categorized_df.to_excel(writer, sheet_name='Kategorisasi', index=False)
         
-        # Format settings
+        # Sheet 2: Hasil Perhitungan Mingguan
+        weekly_results_df.to_excel(writer, sheet_name='Perhitungan Mingguan', index=False)
+        
+        # Sheet 3: Anomali Tanggal
+        if date_anomalies_df is not None and not date_anomalies_df.empty:
+            date_anomalies_df.to_excel(writer, sheet_name='Anomali Tanggal', index=False)
+        
+        # Format untuk setiap sheet
+        workbook = writer.book
         header_format = workbook.add_format({
             'bold': True,
             'align': 'center',
             'bg_color': '#D3D3D3'
         })
-        
-        # Number format
         number_format = workbook.add_format({'num_format': '#,##0'})
         
-        # Apply header format
-        for col_num, value in enumerate(df.columns.values):
-            worksheet.write(0, col_num, value, header_format)
+        # Apply formatting to each sheet
+        sheets = {
+            'Kategorisasi': categorized_df,
+            'Perhitungan Mingguan': weekly_results_df,
+            'Anomali Tanggal': date_anomalies_df
+        }
         
-        # Apply number format to amount columns
-        for col_num in range(1, len(df.columns)):  # Skip the date column
-            worksheet.set_column(col_num, col_num, None, number_format)
-            
-        # Adjust column width
-        for i, col in enumerate(df.columns):
-            column_width = max(df[col].astype(str).map(len).max(), len(col))
-            worksheet.set_column(i, i, column_width + 2)
+        for sheet_name, df in sheets.items():
+            if df is not None and not df.empty:
+                worksheet = writer.sheets[sheet_name]
+                
+                # Apply header format
+                for col_num, value in enumerate(df.columns.values):
+                    worksheet.write(0, col_num, value, header_format)
+                
+                # Apply number format to amount columns
+                for col_num in range(1, len(df.columns)):
+                    worksheet.set_column(col_num, col_num, None, number_format)
+                
+                # Adjust column width
+                for i, col in enumerate(df.columns):
+                    column_width = max(df[col].astype(str).map(len).max(), len(col))
+                    worksheet.set_column(i, i, column_width + 2)
     
     output.seek(0)
     return output
 
-# Main execution flow
+# Modifikasi bagian utama
 if uploaded_file is not None:
     try:
         df = pd.read_excel(uploaded_file)
         
         if st.button('Proses Analisa BBM'):
+            # Simpan hasil kategorisasi
+            categorized_df = df[['TRANS. DATE', 'DESCRIPTION', 'CATEGORY', 'DEBIT']].copy()
+            categorized_df['TRANS. DATE'] = categorized_df['TRANS. DATE'].dt.strftime('%d/%m/%Y')
+            
+            # Proses transaksi
             results_df = process_transactions(df, start_date)
+            
+            # Deteksi anomali tanggal
+            date_anomalies = detect_date_anomalies(df)
             
             st.write("Hasil perhitungan:")
             st.write(results_df)
             
-            # Create Excel download button
-            excel_file = to_excel(results_df)
+            # Create Excel download button dengan 3 sheet
+            excel_file = to_excel(categorized_df, results_df, date_anomalies)
             st.download_button(
                 label="Download Excel",
                 data=excel_file,
