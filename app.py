@@ -23,27 +23,7 @@ with st.form("jabatan_form"):
     lainya_names = st.text_area("Nama lainya (pisahkan dengan koma)", "").split(',')
     submitted = st.form_submit_button("Simpan")
 
-if submitted:
-    st.success("Daftar nama berhasil disimpan!")
-
-# Custom keywords initialization
-custom_keywords = {
-    'MANAGER': [name.strip().lower() for name in manager_names if name.strip()],
-    'ASMEN': [name.strip().lower() for name in asmen_names if name.strip()],
-    'ADMIN': [name.strip().lower() for name in admin_names if name.strip()],
-    'MIS': [name.strip().lower() for name in mis_names if name.strip()],
-    'LAINYA': [name.strip().lower() for name in lainya_names if name.strip()],
-}
-
-# Date input
-start_date = st.date_input(
-    "Pilih tanggal awal (Senin):",
-    datetime.now()
-).strftime('%d/%m/%Y')
-
-# File uploader
-uploaded_file = st.file_uploader("Upload file Excel transaksi:", type=['xlsx', 'xls'])
-
+# Fungsi-fungsi utama
 def is_similar(text, keywords, threshold=85):
     """Helper function untuk mengecek kemiripan string"""
     text = text.lower()
@@ -103,16 +83,9 @@ def create_weekly_ranges(start_date, end_date):
         current = week_end + timedelta(days=1)
     return ranges
 
-# Tambahkan fungsi baru di sini
 def detect_date_anomalies(df):
     """
     Deteksi anomali antara tanggal entri dan tanggal transaksi
-    
-    Args:
-        df (pd.DataFrame): DataFrame yang berisi kolom ENTRY DATE dan TRANS. DATE
-    
-    Returns:
-        pd.DataFrame: DataFrame berisi entri dengan anomali tanggal
     """
     # Konversi kolom tanggal ke datetime
     df['ENTRY DATE'] = pd.to_datetime(df['ENTRY DATE'])
@@ -133,17 +106,7 @@ def detect_date_anomalies(df):
     
     return None
 
-
-def process_transactions(df, start_date):
-    # Existing code, tambahkan bagian deteksi anomali
-    date_anomalies = detect_date_anomalies(df)
-    
-    if date_anomalies is not None:
-        st.warning("⚠️ Terdeteksi Anomali Tanggal:")
-        st.dataframe(date_anomalies)
-
-
-def process_transactions(df, start_date):
+def process_transactions(df, start_date, custom_keywords):
     # Convert start_date to datetime
     start_date = datetime.strptime(start_date, '%d/%m/%Y')
     
@@ -245,6 +208,36 @@ def to_excel(categorized_df, weekly_results_df, date_anomalies_df):
     output.seek(0)
     return output
 
+# Variabel global untuk custom keywords
+if 'custom_keywords' not in st.session_state:
+    st.session_state.custom_keywords = {
+        'MANAGER': [],
+        'ASMEN': [],
+        'ADMIN': [],
+        'MIS': [],
+        'LAINYA': []
+    }
+
+# Saat form di-submit
+if submitted:
+    st.session_state.custom_keywords = {
+        'MANAGER': [name.strip().lower() for name in manager_names if name.strip()],
+        'ASMEN': [name.strip().lower() for name in asmen_names if name.strip()],
+        'ADMIN': [name.strip().lower() for name in admin_names if name.strip()],
+        'MIS': [name.strip().lower() for name in mis_names if name.strip()],
+        'LAINYA': [name.strip().lower() for name in lainya_names if name.strip()],
+    }
+    st.success("Daftar nama berhasil disimpan!")
+
+# Date input
+start_date = st.date_input(
+    "Pilih tanggal awal (Senin):",
+    datetime.now()
+).strftime('%d/%m/%Y')
+
+# File uploader
+uploaded_file = st.file_uploader("Upload file Excel transaksi:", type=['xlsx', 'xls'])
+
 # Modifikasi bagian utama
 if uploaded_file is not None:
     try:
@@ -252,11 +245,12 @@ if uploaded_file is not None:
         
         if st.button('Proses Analisa BBM'):
             # Simpan hasil kategorisasi
+            df['CATEGORY'] = df['DESCRIPTION'].apply(lambda description: categorize_description(description, st.session_state.custom_keywords))
             categorized_df = df[['TRANS. DATE', 'DESCRIPTION', 'CATEGORY', 'DEBIT']].copy()
             categorized_df['TRANS. DATE'] = categorized_df['TRANS. DATE'].dt.strftime('%d/%m/%Y')
             
             # Proses transaksi
-            results_df = process_transactions(df, start_date)
+            results_df = process_transactions(df, start_date, st.session_state.custom_keywords)
             
             # Deteksi anomali tanggal
             date_anomalies = detect_date_anomalies(df)
