@@ -105,7 +105,24 @@ def detect_date_anomalies(df):
         return anomalies[['TRANS. DATE', 'ENTRY DATE', 'DAYS_DIFFERENCE', 'DESCRIPTION', 'DEBIT']]
     
     return None
-
+    
+def process_transactions(df, start_date, custom_keywords):
+    # Convert start_date to datetime
+    start_date = datetime.strptime(start_date, '%d/%m/%Y')
+    
+    # Convert date column to datetime
+    df['TRANS. DATE'] = pd.to_datetime(df['TRANS. DATE'])
+    
+    # Tambahkan kembali bagian deteksi anomali tanggal
+    date_anomalies = detect_date_anomalies(df)
+    
+    if date_anomalies is not None:
+        st.warning("⚠️ Terdeteksi Anomali Tanggal:")
+        st.dataframe(date_anomalies)
+    
+    # Add category column
+    df['CATEGORY'] = df['DESCRIPTION'].apply(lambda description: categorize_description(description, custom_keywords))
+    
 def process_transactions(df, start_date, custom_keywords):
     # Convert start_date to datetime
     start_date = datetime.strptime(start_date, '%d/%m/%Y')
