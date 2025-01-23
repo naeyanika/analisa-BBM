@@ -72,7 +72,7 @@ def detect_date_anomalies(df):
     
     df['DAYS_DIFFERENCE'] = (df['ENTRY DATE'] - df['TRANS. DATE']).dt.days
     
-    anomalies = df[abs(df['DAYS_DIFFERENCE']) > 7].copy()
+    anomalies = df[abs(df['DAYS_DIFFERENCE']) > 1].copy()
     
     if not anomalies.empty:
         anomalies['ENTRY DATE'] = anomalies['ENTRY DATE'].dt.strftime('%d/%m/%Y')
