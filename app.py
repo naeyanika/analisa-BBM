@@ -105,7 +105,34 @@ def create_weekly_ranges(start_date, end_date):
 
 # Tambahkan fungsi baru di sini
 def detect_date_anomalies(df):
-    # Kode yang saya berikan sebelumnya
+    """
+    Deteksi anomali antara tanggal entri dan tanggal transaksi
+    
+    Args:
+        df (pd.DataFrame): DataFrame yang berisi kolom ENTRY DATE dan TRANS. DATE
+    
+    Returns:
+        pd.DataFrame: DataFrame berisi entri dengan anomali tanggal
+    """
+    # Konversi kolom tanggal ke datetime
+    df['ENTRY DATE'] = pd.to_datetime(df['ENTRY DATE'])
+    df['TRANS. DATE'] = pd.to_datetime(df['TRANS. DATE'])
+    
+    # Hitung selisih hari antara tanggal entri dan tanggal transaksi
+    df['DAYS_DIFFERENCE'] = (df['ENTRY DATE'] - df['TRANS. DATE']).dt.days
+    
+    # Deteksi anomali - misalnya, perbedaan lebih dari 7 hari dianggap anomali
+    anomalies = df[abs(df['DAYS_DIFFERENCE']) > 7].copy()
+    
+    if not anomalies.empty:
+        # Format ulang tanggal untuk tampilan yang lebih baik
+        anomalies['ENTRY DATE'] = anomalies['ENTRY DATE'].dt.strftime('%d/%m/%Y')
+        anomalies['TRANS. DATE'] = anomalies['TRANS. DATE'].dt.strftime('%d/%m/%Y')
+        
+        return anomalies[['TRANS. DATE', 'ENTRY DATE', 'DAYS_DIFFERENCE', 'DESCRIPTION', 'DEBIT']]
+    
+    return None
+
 
 def process_transactions(df, start_date):
     # Existing code, tambahkan bagian deteksi anomali
